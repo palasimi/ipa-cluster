@@ -5,9 +5,14 @@
 
 import { strict as assert } from "assert";
 
-describe("index.ts", () => {
-  it("should export `parse` from `parser.ts`", async () => {
-    const index = await import("../src/index");
+describe("index.ts", async () => {
+  const index = await import("../src/index");
+
+  it("should export `parse` from `parser.ts`", () => {
     assert.ok(Object.prototype.hasOwnProperty.call(index, "parse"));
+  });
+
+  it("should export `toQuerier` from `evaluate.ts`", () => {
+    assert.ok(Object.prototype.hasOwnProperty.call(index, "toQuerier"));
   });
 });
