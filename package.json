@@ -1,0 +1,44 @@
+{
+  "name": "sound-change-parser",
+  "version": "1.0.0",
+  "description": "Parser for phonological rules",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild --bundle --minify --outdir=dist --sourcemap src/index.ts",
+    "check": "npm run typecheck && npm run lint && npm run format && npm run test:cov",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint src test",
+    "lint:fix": "eslint --fix src test",
+    "test": "mocha",
+    "test:cov": "nyc mocha",
+    "typecheck": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/palasimi/sound-change-parser.git"
+  },
+  "keywords": [
+    "linguistics",
+    "phonology",
+    "sound-change",
+    "parser"
+  ],
+  "author": "Levi Gruspe",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/palasimi/sound-change-parser/issues"
+  },
+  "homepage": "https://github.com/palasimi/sound-change-parser#readme",
+  "devDependencies": {
+    "@types/mocha": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.11",
+    "@typescript-eslint/parser": "^5.59.11",
+    "esbuild": "^0.18.1",
+    "eslint": "^8.42.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.9.1"
+  }
+}
