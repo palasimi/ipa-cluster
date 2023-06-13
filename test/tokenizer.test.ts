@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (c) 2023 Levi Gruspe
+
 // Test tokenizer.ts.
 
 import { tokenize } from "../src/tokenizer";

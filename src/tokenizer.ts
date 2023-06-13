@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (c) 2023 Levi Gruspe
+
 // Iterate through tokens in code.
 export function* tokenize(code: string): Iterable<string> {
   const lines = code.split("\n");

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (c) 2023 Levi Gruspe
+
 // Test index.ts.
 
 import { strict as assert } from "assert";

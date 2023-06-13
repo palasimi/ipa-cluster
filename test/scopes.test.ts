@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (c) 2023 Levi Gruspe
+
 // Test scopes.ts.
 
 import { Scope } from "../src/scopes";
