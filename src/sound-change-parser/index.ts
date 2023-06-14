@@ -2,5 +2,5 @@
 // Copyright (c) 2023 Levi Gruspe
 
 export { Querier, QueryOptions, toQuerier } from "./evaluate";
-export { parse } from "./parser";
+export { parse, ParseError } from "./parser";
 export { Sound, Environment, Rule, Context, Ruleset } from "./tree";

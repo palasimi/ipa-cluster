@@ -12,6 +12,10 @@ describe("index.ts", async () => {
     assert.ok(Object.prototype.hasOwnProperty.call(index, "parse"));
   });
 
+  it("should export `ParseError` from `parser.ts`", () => {
+    assert.ok(Object.prototype.hasOwnProperty.call(index, "ParseError"));
+  });
+
   it("should export `toQuerier` from `evaluate.ts`", () => {
     assert.ok(Object.prototype.hasOwnProperty.call(index, "toQuerier"));
   });
