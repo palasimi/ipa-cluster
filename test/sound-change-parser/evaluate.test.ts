@@ -3,8 +3,8 @@
 
 // Test evaluate.ts.
 
-import { toQuerier } from "../src/evaluate";
-import { parse } from "../src/parser";
+import { toQuerier } from "../../src/sound-change-parser/evaluate";
+import { parse } from "../../src/sound-change-parser/parser";
 
 import { strict as assert } from "assert";
 

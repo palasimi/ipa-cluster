@@ -3,8 +3,8 @@
 
 // Test scopes.ts.
 
-import { Scope } from "../src/scopes";
-import { SegmentSound } from "../src/tree";
+import { Scope } from "../../src/sound-change-parser/scopes";
+import { SegmentSound } from "../../src/sound-change-parser/tree";
 
 import { strict as assert } from "assert";
 

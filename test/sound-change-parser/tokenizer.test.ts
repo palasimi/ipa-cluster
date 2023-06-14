@@ -3,7 +3,7 @@
 
 // Test tokenizer.ts.
 
-import { tokenize } from "../src/tokenizer";
+import { tokenize } from "../../src/sound-change-parser/tokenizer";
 
 import { strict as assert } from "assert";
 

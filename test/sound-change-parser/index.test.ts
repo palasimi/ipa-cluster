@@ -6,7 +6,7 @@
 import { strict as assert } from "assert";
 
 describe("index.ts", async () => {
-  const index = await import("../src/index");
+  const index = await import("../../src/sound-change-parser/index");
 
   it("should export `parse` from `parser.ts`", () => {
     assert.ok(Object.prototype.hasOwnProperty.call(index, "parse"));

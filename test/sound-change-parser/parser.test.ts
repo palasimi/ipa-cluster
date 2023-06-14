@@ -3,7 +3,7 @@
 
 // Test parser.ts.
 
-import { parse } from "../src/parser";
+import { parse } from "../../src/sound-change-parser/parser";
 
 import { strict as assert } from "assert";
 
