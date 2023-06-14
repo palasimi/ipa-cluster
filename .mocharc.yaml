@@ -3,4 +3,4 @@ extensions:
   - "ts"
   - "tsx"
 spec:
-  - "test/*.test.*"
+  - "test/**/*.test.ts"
