@@ -43,7 +43,7 @@ function createCostFunction(code: string): CostFunction<string> {
 // Uses the OPTICS clustering algorithm and the Levenshtein distance function.
 // `ignores` specifies edits/sound changes to not penalize.
 // May raise `ParseError`.
-export function clusterByIPA(dataset: Data[], ignores: string): Data[][] {
+export function clusterByIPA(dataset: Data[], ignores = ""): Data[][] {
   const cost = createCostFunction(ignores);
   const metric = (a: string[], b: string[]) => levenshtein(a, b, cost);
   return cluster(dataset, metric);
