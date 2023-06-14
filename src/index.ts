@@ -39,12 +39,31 @@ function createCostFunction(code: string): CostFunction<string> {
   };
 }
 
+export type ClusterByIPAOptions = {
+  // Same as `epsilon` option to `cluster`.
+  epsilon?: number;
+
+  // Sound changes to ignore penalties for.
+  ignores?: string;
+};
+
+const defaultOptions = {
+  epsilon: 1.1,
+  ignores: "",
+};
+
 // Cluster words with similar IPA transcriptions together.
 // Uses the OPTICS clustering algorithm and the Levenshtein distance function.
 // `ignores` specifies edits/sound changes to not penalize.
 // May raise `ParseError`.
-export function clusterByIPA(dataset: Data[], ignores = ""): Data[][] {
+export function clusterByIPA(
+  dataset: Data[],
+  options: ClusterByIPAOptions = defaultOptions
+): Data[][] {
+  const epsilon = options?.epsilon || defaultOptions.epsilon;
+  const ignores = options?.ignores || "";
+
   const cost = createCostFunction(ignores);
   const metric = (a: string[], b: string[]) => levenshtein(a, b, cost);
-  return cluster(dataset, metric);
+  return cluster(dataset, metric, { epsilon });
 }

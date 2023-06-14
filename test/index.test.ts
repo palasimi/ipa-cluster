@@ -12,23 +12,24 @@ describe("clusterByIPA", () => {
 
   describe("without ignores", () => {
     it("should penalize unequal IPA segments", () => {
-      const clusters = clusterByIPA(dataset, "");
+      const clusters = clusterByIPA(dataset);
       assert.equal(clusters.length, 3);
     });
   });
 
   describe("with ignores", () => {
     it("should not penalize edits specified in the ruleset", () => {
-      const code = `
+      const ignores = `
         -- Sound changes work like types of edits to ignore.
         q -> a
         w -> s
         e -> d
       `;
-      const clusters = clusterByIPA(dataset, code);
+      const clusters = clusterByIPA(dataset, { ignores });
       clusters.sort((a: Data[], b: Data[]) => a.length - b.length);
 
-      // The code is written to cause "qwe" and "asd" to be clustered together.
+      // The ignore list is written to cause "qwe" and "asd" to be clustered
+      // together.
       assert.equal(clusters.length, 2);
       assert.deepEqual(clusters[0], [{ ipa: "z x c" }]);
     });
