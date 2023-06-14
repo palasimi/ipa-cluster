@@ -3,7 +3,7 @@
 
 // String metric/distance functions.
 
-interface Sequence<T> {
+export interface Sequence<T> {
   [key: number]: T;
   length: number;
 }
