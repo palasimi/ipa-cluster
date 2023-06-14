@@ -11,11 +11,7 @@ The [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) i
 import { clusterByIPA } from "ipa-cluster";
 
 // The IPA transcriptions should be tokenized.
-const dataset = [
-    { ipa: "f uː" },
-    { ipa: "b ɑː r" },
-    { ipa: "b ɑː z" },
-];
+const dataset = [{ ipa: "f uː" }, { ipa: "b ɑː r" }, { ipa: "b ɑː z" }];
 
 // Produces one cluster for [fuː] and another for [bɑːr] and [bɑːz].
 const clusters = clusterByIPA(dataset);
@@ -36,7 +32,7 @@ Normally, the algorithm would consider [a] and [o] to be a mismatch, but by incl
 
 ```typescript
 const options = {
-    ignores: `
+  ignores: `
         a -> o
         b -> p
     `,
