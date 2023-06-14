@@ -4,7 +4,7 @@
   "description": "Parser for phonological rules",
   "main": "dist/index.js",
   "scripts": {
-    "build": "esbuild --bundle --minify --outdir=dist --sourcemap src/index.ts",
+    "build": "esbuild --bundle --minify --outdir=dist --sourcemap --target=es6 src/index.ts",
     "check": "npm run typecheck && npm run lint && npm run format && npm run test:cov",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
