@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "esbuild --bundle --minify --outdir=dist --sourcemap --target=es6 src/index.ts",
+    "build:demo": "esbuild --bundle --minify --outdir=build --target=es6 --platform=node scripts/demo.ts",
     "check": "npm run typecheck && npm run lint && npm run format && npm run test:cov",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
