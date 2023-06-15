@@ -43,6 +43,8 @@ function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
   const contextMap = new Map();
 
   for (const ruleset of tree) {
+    // TODO reverse direction? or make sure language pair is sorted...
+    // TODO flatten key so that only one map is needed
     const context = `${ruleset.context[0]} ${ruleset.context[1]}`;
     if (!contextMap.has(context)) {
       contextMap.set(context, new Map());
@@ -61,6 +63,7 @@ function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
         // Expand classes in sound expressions.
         for (const lhs of toSoundString(rule.lhs)) {
           for (const rhs of toSoundString(rule.rhs)) {
+            // TODO shouldn't this rule also be added to the global context
             const pair = `${lhs} -> ${rhs}`;
             pairSet.add(pair);
           }
@@ -75,18 +78,18 @@ function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
 export type QueryOptions = {
   // Pair of language codes to which a sound change rule applies.
   context?: {
-    left: string;
-    right: string;
+    left?: string;
+    right?: string;
   };
 
   // Environment of the sound change.
   // E.g. "a _ #".
   environment?: {
     // This is the string before the "_".
-    before: string;
+    before?: string;
 
     // This is the string after the "_".
-    after: string;
+    after?: string;
   };
 };
 

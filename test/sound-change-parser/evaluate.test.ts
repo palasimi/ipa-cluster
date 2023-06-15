@@ -32,4 +32,79 @@ describe("toQuerier", () => {
       }
     }
   });
+
+  describe("when sound change rule specifies an environment", () => {
+    const code = "b -> p / _ #";
+    const tree = parse(code);
+    const fn = toQuerier(tree);
+
+    describe("when query specifies a matching environment", () => {
+      it("rule should be found", () => {
+        const optionsA = {
+          environment: {
+            before: "a", // This shouldn't matter.
+            after: "#",
+          },
+        };
+        const optionsB = {
+          environment: {
+            after: "#",
+          },
+        };
+        const optionsC = {
+          environment: {
+            before: "*",
+            after: "#",
+          },
+        };
+        const optionsD = {
+          environment: {
+            before: "",
+            after: "#",
+          },
+        };
+
+        for (const options of [optionsA, optionsB, optionsC, optionsD]) {
+          assert.ok(fn("b", "p", options));
+          assert.ok(fn("p", "b", options));
+        }
+      });
+    });
+
+    describe("when query specifies the wrong environment", () => {
+      it("rule should not be found", () => {
+        assert.ok(!fn("b", "p"));
+        assert.ok(!fn("p", "b"));
+
+        const options = {
+          environment: {
+            before: "q",
+            after: "q",
+          },
+        };
+        assert.ok(!fn("b", "p", options));
+      });
+    });
+  });
+
+  describe("when sound change rule does not specify an environment", () => {
+    it("rule should be found as long as pair is equivalent", () => {
+      const code = "b -> p";
+      const tree = parse(code);
+      const fn = toQuerier(tree);
+
+      const options = {
+        environment: {
+          before: "a",
+          after: "q",
+        },
+      };
+
+      assert.ok(fn("b", "p"));
+      assert.ok(fn("p", "b"));
+
+      assert.ok(fn("b", "p", options));
+      assert.ok(fn("p", "b", options));
+    });
+  });
 });
