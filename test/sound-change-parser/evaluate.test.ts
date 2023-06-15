@@ -33,6 +33,31 @@ describe("toQuerier", () => {
     }
   });
 
+  describe("when rule has no language annotation", () => {
+    it("order of segments in queries shouldn't matter", () => {
+      const examples = [
+        ["a", "b"],
+        ["c", "d"],
+        ["e", "f"],
+        ["g", "h"],
+      ];
+
+      let code = "";
+      for (const [lhs, rhs] of examples) {
+        code += `${lhs} -> ${rhs}${"\n"}`;
+      }
+      const tree = parse(code);
+      const fn = toQuerier(tree);
+
+      assert.ok(code.length > 0);
+
+      for (const [lhs, rhs] of examples) {
+        assert.ok(fn(lhs, rhs));
+        assert.ok(fn(rhs, lhs));
+      }
+    });
+  });
+
   describe("when sound change rule specifies an environment", () => {
     const code = "b -> p / _ #";
     const tree = parse(code);
