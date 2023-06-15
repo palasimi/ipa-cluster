@@ -96,10 +96,33 @@ export type Querier = (a: string, b: string, options?: QueryOptions) => boolean;
 export function toQuerier(tree: Ruleset[]): Querier {
   const contextMap = toMap(tree);
 
+  // Memoize query function, because it's expected to be called a lot.
+  // Only global sound changes (no context or environment constraints) will be
+  // cached, because if the cache indices are too specific, there would be a
+  // lot of cache misses.
+  const cache = new Map();
+
   // Check if sound change appears in the ruleset.
   return function querier(a: string, b: string, options: QueryOptions = {}) {
+    // Get options.
     const left = options.context?.left || "*";
     const right = options.context?.right || "*";
+    const before = options.environment?.before || "";
+    const after = options.environment?.after || "";
+
+    // Check cache.
+    const key1 = `${a} ${b}`;
+    const value1 = cache.get(key1);
+    if (value1 != null) {
+      return value1;
+    }
+
+    const key2 = `${b} ${a}`;
+    const value2 = cache.get(key2);
+    if (value2 != null) {
+      return value2;
+    }
+
     const contexts = ["* *"];
     if (left !== "*") {
       contexts.push(`${left} *`);
@@ -111,8 +134,6 @@ export function toQuerier(tree: Ruleset[]): Querier {
       contexts.push(`${left} ${right}`);
     }
 
-    const before = options.environment?.before || "";
-    const after = options.environment?.after || "";
     const environments = [" _ "];
     if (before !== "") {
       environments.push(`${before} _ `);
@@ -140,11 +161,20 @@ export function toQuerier(tree: Ruleset[]): Querier {
 
         for (const pair of pairs) {
           if (pairSet.has(pair)) {
+            // Save in cache if the query has no constraints.
+            if (context === "* *" && environment === " _ ") {
+              cache.set(key1, true);
+              cache.set(key2, true);
+            }
             return true;
           }
         }
       }
     }
+    // There's no need to check for constraints, because it is certain that
+    // even non-constrained queries would fail at this point.
+    cache.set(key1, false);
+    cache.set(key2, false);
     return false;
   };
 }
