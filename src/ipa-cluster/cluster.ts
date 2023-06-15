@@ -27,12 +27,6 @@ export function cluster(
   metric: Metric,
   options: ClusterOptions = defaultOptions
 ): Data[][] {
-  const epsilon = options.epsilon;
-  const minPoints = 2;
-
-  const optics = new OPTICS();
-  const indices = dataset.map((_, index: number) => index);
-
   // Pre-compute all distances.
   const cache: Map<string, number> = new Map();
   for (const [i, a] of dataset.entries()) {
@@ -43,11 +37,13 @@ export function cluster(
       const ipaB = b.ipa.split(" ");
 
       const key = `${j} ${i}`;
+      // TODO pass language info to metric
       const value = metric(ipaA, ipaB);
       cache.set(key, value);
     }
   }
 
+  // Find clusters.
   const newMetric = (i: number, j: number) => {
     if (i === j) {
       return 0;
@@ -57,6 +53,13 @@ export function cluster(
     }
     return cache.get(`${i} ${j}`);
   };
+
+  const epsilon = options.epsilon;
+  const minPoints = 2;
+
+  const optics = new OPTICS();
+  const indices = dataset.map((_, index: number) => index);
+
   // @types/density-clustering seems to have a bug.
   // @ts-ignore
   const clusters = optics.run(indices, epsilon, minPoints, newMetric);
