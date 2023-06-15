@@ -8,6 +8,10 @@ export interface Sequence<T> {
   length: number;
 }
 
+export type CostFunctionOptions = {
+  [key: string | number]: unknown;
+};
+
 // The cost function compares `s[i]` with `t[j]`.
 // The cost should be 0 if the two are equal, positive otherwise.
 // The larger the cost, the larger the distance.
@@ -20,7 +24,8 @@ export type CostFunction<T> = (
   s: Sequence<T>,
   t: Sequence<T>,
   i: number,
-  j: number
+  j: number,
+  options?: CostFunctionOptions
 ) => number;
 
 // Default cost function for the Levenshtein distance.
@@ -42,27 +47,34 @@ function defaultCost<T>(
 }
 
 // Total cost to turn an empty string into the given string.
-function totalCost<T>(s: Sequence<T>, cost: CostFunction<T>): number {
+function totalCost<T>(
+  s: Sequence<T>,
+  cost: CostFunction<T>,
+  options: CostFunctionOptions = {}
+): number {
   let total = 0;
   const t: Sequence<T> = [];
   for (let i = 0; i < s.length; i++) {
-    total += cost(s, t, i, -1);
+    total += cost(s, t, i, -1, options);
   }
   return total;
 }
 
 // Compute the weighted Levenshtein distance between two sequences.
+// The options argument is passed to the cost function.
+// It can be used to pass additional data to the cost function.
 export function levenshtein<T>(
   s: Sequence<T>,
   t: Sequence<T>,
-  cost: CostFunction<T> = defaultCost
+  cost: CostFunction<T> = defaultCost,
+  options: CostFunctionOptions = {}
 ): number {
   // Special case: |s||t| = 0.
   if (s.length === 0) {
-    return totalCost(t, cost);
+    return totalCost(t, cost, options);
   }
   if (t.length === 0) {
-    return totalCost(s, cost);
+    return totalCost(s, cost, options);
   }
 
   // Initialize |s|-by-|t| matrix.
@@ -74,10 +86,10 @@ export function levenshtein<T>(
   // The cost is the total cost of insertions, because the only way to get the
   // next substring is to insert the missing character.
   for (let j = 1; j < t.length; j++) {
-    distance[0][j] = distance[0][j - 1] + cost(s, t, -1, j);
+    distance[0][j] = distance[0][j - 1] + cost(s, t, -1, j, options);
   }
   for (let i = 1; i < s.length; i++) {
-    distance[i][0] = distance[i - 1][0] + cost(s, t, i, -1);
+    distance[i][0] = distance[i - 1][0] + cost(s, t, i, -1, options);
   }
 
   for (let i = 1; i < s.length; i++) {
@@ -90,9 +102,9 @@ export function levenshtein<T>(
       // There are three ways to get the next substring: by substitution, by
       // inserting the character from `s`, or by inserting the character from `t`.
       distance[i][j] = Math.min(
-        distance[i - 1][j - 1] + cost(s, t, i, j),
-        distance[i - 1][j] + cost(s, t, i, -j - 1),
-        distance[i][j - 1] + cost(s, t, -i - 1, j)
+        distance[i - 1][j - 1] + cost(s, t, i, j, options),
+        distance[i - 1][j] + cost(s, t, i, -j - 1, options),
+        distance[i][j - 1] + cost(s, t, -i - 1, j, options)
       );
     }
   }

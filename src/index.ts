@@ -70,8 +70,11 @@ export function clusterByIPA(
 
   const cost = createCostFunction(ignores);
   const metric = (p: Point, q: Point) => {
-    // TODO language context to levenshtein
-    return levenshtein(p.ipa, q.ipa, cost);
+    const options = {
+      left: p.language,
+      right: q.language,
+    };
+    return levenshtein(p.ipa, q.ipa, cost, options);
   };
   return cluster(dataset, metric, { epsilon });
 }
