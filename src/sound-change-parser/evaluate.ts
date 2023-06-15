@@ -110,7 +110,7 @@ export function toQuerier(tree: Ruleset[]): Querier {
   // Only global sound changes (no context or environment constraints) will be
   // cached, because if the cache indices are too specific, there would be a
   // lot of cache misses.
-  const cache = new Map();
+  const cache = new Set();
 
   // Check if sound change appears in the ruleset.
   return function querier(a: string, b: string, options: QueryOptions = {}) {
@@ -131,9 +131,8 @@ export function toQuerier(tree: Ruleset[]): Querier {
     // Note that only queries with no constraints are cached, so the order of
     // segments in the key don't have to match the order of languages.
     const key = a < b ? `${a} ${b}` : `${b} ${a}`;
-    const value = cache.get(key);
-    if (value != null) {
-      return value;
+    if (cache.has(key)) {
+      return true;
     }
 
     const contexts = ["* *"];
@@ -175,12 +174,11 @@ export function toQuerier(tree: Ruleset[]): Querier {
         if (pairSet == null) {
           continue;
         }
-
         for (const pair of pairs) {
           if (pairSet.has(pair)) {
             // Save in cache if the query has no constraints.
             if (context === "* *" && environment === " _ ") {
-              cache.set(key, true);
+              cache.add(key);
             }
             return true;
           }
