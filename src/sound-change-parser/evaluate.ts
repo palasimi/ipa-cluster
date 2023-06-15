@@ -43,9 +43,16 @@ function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
   const contextMap = new Map();
 
   for (const ruleset of tree) {
-    // TODO reverse direction? or make sure language pair is sorted...
+    let [left, right] = ruleset.context;
+
+    // Whether to reverse order of languages or not.
+    const reverse = right < left;
+    if (reverse) {
+      [left, right] = [right, left];
+    }
+
     // TODO flatten key so that only one map is needed
-    const context = `${ruleset.context[0]} ${ruleset.context[1]}`;
+    const context = `${left} ${right}`;
     if (!contextMap.has(context)) {
       contextMap.set(context, new Map());
     }
@@ -64,7 +71,7 @@ function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
         for (const lhs of toSoundString(rule.lhs)) {
           for (const rhs of toSoundString(rule.rhs)) {
             // TODO shouldn't this rule also be added to the global context
-            const pair = `${lhs} -> ${rhs}`;
+            const pair = reverse ? `${rhs} -> ${lhs}` : `${lhs} -> ${rhs}`;
             pairSet.add(pair);
           }
         }
@@ -108,12 +115,21 @@ export function toQuerier(tree: Ruleset[]): Querier {
   // Check if sound change appears in the ruleset.
   return function querier(a: string, b: string, options: QueryOptions = {}) {
     // Get options.
-    const left = options.context?.left || "*";
-    const right = options.context?.right || "*";
+    let left = options.context?.left || "*";
+    let right = options.context?.right || "*";
     const before = options.environment?.before || "";
     const after = options.environment?.after || "";
 
+    // Fix order of options.
+    const reverse = right < left;
+    if (reverse) {
+      [a, b] = [b, a];
+      [left, right] = [right, left];
+    }
+
     // Check cache.
+    // Note that only queries with no constraints are cached, so the order of
+    // segments in the key don't have to match the order of languages.
     const key = a < b ? `${a} ${b}` : `${b} ${a}`;
     const value = cache.get(key);
     if (value != null) {
@@ -142,7 +158,11 @@ export function toQuerier(tree: Ruleset[]): Querier {
       environments.push(`${before} _ ${after}`);
     }
 
-    const pairs = [`${a} -> ${b}`, `${b} -> ${a}`];
+    const pairs = [`${a} -> ${b}`];
+    // If there are no additional constraints, only insert the reverse.
+    if (contexts.length === 1) {
+      pairs.push(`${b} -> ${a}`);
+    }
 
     for (const context of contexts) {
       const environmentMap = contextMap.get(context);
@@ -167,9 +187,6 @@ export function toQuerier(tree: Ruleset[]): Querier {
         }
       }
     }
-    // There's no need to check for constraints, because it is certain that
-    // even non-constrained queries would fail at this point.
-    cache.set(key, false);
     return false;
   };
 }

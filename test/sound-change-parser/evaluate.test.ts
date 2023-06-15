@@ -33,6 +33,40 @@ describe("toQuerier", () => {
     }
   });
 
+  describe("when rule has language annotation", () => {
+    it("segments and languages in queries should be aligned to match", () => {
+      const code = `
+        en de {
+          b -> p / _ #
+        }
+      `;
+      const tree = parse(code);
+      const fn = toQuerier(tree);
+
+      const environment = { after: "#" };
+      const optionsA = {
+        context: {
+          left: "en",
+          right: "de",
+        },
+        environment,
+      };
+      const optionsB = {
+        context: {
+          left: "de",
+          right: "en",
+        },
+        environment,
+      };
+
+      assert.ok(fn("b", "p", optionsA));
+      assert.ok(!fn("p", "b", optionsA));
+
+      assert.ok(fn("p", "b", optionsB));
+      assert.ok(!fn("b", "p", optionsB));
+    });
+  });
+
   describe("when rule has no language annotation", () => {
     it("order of segments in queries shouldn't matter", () => {
       const examples = [
