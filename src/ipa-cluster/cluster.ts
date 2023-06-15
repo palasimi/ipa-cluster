@@ -35,6 +35,10 @@ export function cluster(
 
   const cache: Map<string, number> = new Map();
   const newMetric = (i: number, j: number) => {
+    if (i === j) {
+      return 0;
+    }
+
     [i, j] = [Math.min(i, j), Math.max(i, j)];
     const key = `${i} ${j}`;
     if (!cache.has(key)) {
@@ -42,6 +46,7 @@ export function cluster(
       const b = dataset[j];
       const value = metric(a.ipa.split(" "), b.ipa.split(" "));
       cache.set(key, value);
+      return value;
     }
     return cache.get(key);
   };
