@@ -111,16 +111,10 @@ export function toQuerier(tree: Ruleset[]): Querier {
     const after = options.environment?.after || "";
 
     // Check cache.
-    const key1 = `${a} ${b}`;
-    const value1 = cache.get(key1);
-    if (value1 != null) {
-      return value1;
-    }
-
-    const key2 = `${b} ${a}`;
-    const value2 = cache.get(key2);
-    if (value2 != null) {
-      return value2;
+    const key = a < b ? `${a} ${b}` : `${b} ${a}`;
+    const value = cache.get(key);
+    if (value != null) {
+      return value;
     }
 
     const contexts = ["* *"];
@@ -163,8 +157,7 @@ export function toQuerier(tree: Ruleset[]): Querier {
           if (pairSet.has(pair)) {
             // Save in cache if the query has no constraints.
             if (context === "* *" && environment === " _ ") {
-              cache.set(key1, true);
-              cache.set(key2, true);
+              cache.set(key, true);
             }
             return true;
           }
@@ -173,8 +166,7 @@ export function toQuerier(tree: Ruleset[]): Querier {
     }
     // There's no need to check for constraints, because it is certain that
     // even non-constrained queries would fail at this point.
-    cache.set(key1, false);
-    cache.set(key2, false);
+    cache.set(key, false);
     return false;
   };
 }
