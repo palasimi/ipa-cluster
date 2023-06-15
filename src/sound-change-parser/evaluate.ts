@@ -100,20 +100,31 @@ export function toQuerier(tree: Ruleset[]): Querier {
   return function querier(a: string, b: string, options: QueryOptions = {}) {
     const left = options.context?.left || "*";
     const right = options.context?.right || "*";
-    let contexts = [`${left} ${right}`, `${left} *`, `* ${right}`, "* *"];
-    contexts = Array.from(new Set(contexts));
+    const contexts = ["* *"];
+    if (left !== "*") {
+      contexts.push(`${left} *`);
+    }
+    if (right !== "*") {
+      contexts.push(`* ${right}`);
+    }
+    if (left !== "*" && right !== "*") {
+      contexts.push(`${left} ${right}`);
+    }
 
     const before = options.environment?.before || "";
     const after = options.environment?.after || "";
-    let environments = [
-      `${before} _ ${after}`,
-      `${before} _ `,
-      ` _ ${after}`,
-      ` _ `,
-    ];
-    environments = Array.from(new Set(environments));
+    const environments = [" _ "];
+    if (before !== "") {
+      environments.push(`${before} _ `);
+    }
+    if (after !== "") {
+      environments.push(` _ ${after}`);
+    }
+    if (before !== "" && after !== "") {
+      environments.push(`${before} _ ${after}`);
+    }
 
-    const pairs = Array.from(new Set([`${a} -> ${b}`, `${b} -> ${a}`]));
+    const pairs = [`${a} -> ${b}`, `${b} -> ${a}`];
 
     for (const context of contexts) {
       const environmentMap = contextMap.get(context);
