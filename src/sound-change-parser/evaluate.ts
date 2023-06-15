@@ -51,7 +51,6 @@ function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
       [left, right] = [right, left];
     }
 
-    // TODO flatten key so that only one map is needed
     const context = `${left} ${right}`;
     if (!contextMap.has(context)) {
       contextMap.set(context, new Map());
@@ -70,7 +69,6 @@ function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
         // Expand classes in sound expressions.
         for (const lhs of toSoundString(rule.lhs)) {
           for (const rhs of toSoundString(rule.rhs)) {
-            // TODO shouldn't this rule also be added to the global context
             const pair = reverse ? `${rhs} -> ${lhs}` : `${lhs} -> ${rhs}`;
             pairSet.add(pair);
           }
@@ -158,7 +156,7 @@ export function toQuerier(tree: Ruleset[]): Querier {
     }
 
     const pairs = [`${a} -> ${b}`];
-    // If there are no additional constraints, only insert the reverse.
+    // If there are no language constraints, also insert the reverse.
     if (contexts.length === 1) {
       pairs.push(`${b} -> ${a}`);
     }
