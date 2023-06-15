@@ -7,10 +7,21 @@ import { OPTICS } from "density-clustering";
 export type Data = {
   // Space-separated list of segments.
   ipa: string;
+
+  // Language code.
+  language?: string;
 };
 
-// Each element is an IPA segment/sound.
-export type Metric = (a: string[], b: string[]) => number;
+// Post-processed data.
+export type Point = {
+  // Tokens of IPA segments.
+  ipa: string[];
+
+  // Language code.
+  language?: string;
+};
+
+export type Metric = (p: Point, q: Point) => number;
 
 export type ClusterOptions = {
   epsilon: number;
@@ -34,11 +45,17 @@ export function cluster(
 
     for (let j = 0; j < i; ++j) {
       const b = dataset[j];
-      const ipaB = b.ipa.split(" ");
+      const p = {
+        language: a.language,
+        ipa: ipaA,
+      };
+      const q = {
+        language: b.language,
+        ipa: b.ipa.split(" "),
+      };
 
       const key = `${j} ${i}`;
-      // TODO pass language info to metric
-      const value = metric(ipaA, ipaB);
+      const value = metric(p, q);
       cache.set(key, value);
     }
   }

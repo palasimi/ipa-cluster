@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2023 Levi Gruspe
 
-import { cluster, Data } from "./ipa-cluster/cluster";
+import { cluster, Data, Point } from "./ipa-cluster/cluster";
 import { CostFunction, levenshtein, Sequence } from "./ipa-cluster/metrics";
 import { parse, toQuerier } from "./sound-change-parser/index";
 
@@ -69,6 +69,9 @@ export function clusterByIPA(
   const ignores = options?.ignores || "";
 
   const cost = createCostFunction(ignores);
-  const metric = (a: string[], b: string[]) => levenshtein(a, b, cost);
+  const metric = (p: Point, q: Point) => {
+    // TODO language context to levenshtein
+    return levenshtein(p.ipa, q.ipa, cost);
+  };
   return cluster(dataset, metric, { epsilon });
 }

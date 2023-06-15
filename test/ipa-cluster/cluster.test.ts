@@ -3,7 +3,7 @@
 
 // Test cluster.ts.
 
-import { cluster, Data } from "../../src/ipa-cluster/cluster";
+import { cluster, Data, Point } from "../../src/ipa-cluster/cluster";
 import { levenshtein } from "../../src/ipa-cluster/metrics";
 
 import { strict as assert } from "assert";
@@ -11,7 +11,8 @@ import { strict as assert } from "assert";
 describe("cluster", () => {
   it("smoke test", () => {
     const dataset = [{ ipa: "f o o" }, { ipa: "b a r" }, { ipa: "b a z" }];
-    const clusters = cluster(dataset, levenshtein);
+    const metric = (p: Point, q: Point) => levenshtein(p.ipa, q.ipa);
+    const clusters = cluster(dataset, metric);
     clusters.sort((a: Data[], b: Data[]) => a.length - b.length);
 
     // The clusters should be foo and bar-baz.
