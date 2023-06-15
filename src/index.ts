@@ -2,7 +2,12 @@
 // Copyright (c) 2023 Levi Gruspe
 
 import { cluster, Data, Point } from "./ipa-cluster/cluster";
-import { CostFunction, levenshtein, Sequence } from "./ipa-cluster/metrics";
+import {
+  CostFunction,
+  CostFunctionOptions,
+  levenshtein,
+  Sequence,
+} from "./ipa-cluster/metrics";
 import { parse, toQuerier } from "./sound-change-parser/index";
 
 // Create cost function for IPA clustering.
@@ -17,7 +22,8 @@ function createCostFunction(code: string): CostFunction<string> {
     s: Sequence<string>,
     t: Sequence<string>,
     i: number,
-    j: number
+    j: number,
+    options: CostFunctionOptions = {}
   ) {
     const a = s[i] || "";
     const b = t[j] || "";
@@ -26,8 +32,9 @@ function createCostFunction(code: string): CostFunction<string> {
       return 0;
     }
 
-    // TODO set languages
-    const context = { left: "*", right: "*" };
+    const left = (options.left as string) || "*";
+    const right = (options.right as string) || "*";
+    const context = { left, right };
 
     const environmentS = {
       before: s[i - 1] || "#",
