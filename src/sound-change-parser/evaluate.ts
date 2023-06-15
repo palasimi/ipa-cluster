@@ -96,23 +96,8 @@ export type Querier = (a: string, b: string, options?: QueryOptions) => boolean;
 export function toQuerier(tree: Ruleset[]): Querier {
   const contextMap = toMap(tree);
 
-  const defaultOptions = {
-    context: {
-      left: "*",
-      right: "*",
-    },
-    environment: {
-      before: "",
-      after: "",
-    },
-  };
-
   // Check if sound change appears in the ruleset.
-  return function querier(
-    a: string,
-    b: string,
-    options: QueryOptions = defaultOptions
-  ) {
+  return function querier(a: string, b: string, options: QueryOptions = {}) {
     const left = options.context?.left || "*";
     const right = options.context?.right || "*";
     let contexts = [`${left} ${right}`, `${left} *`, `* ${right}`, "* *"];
