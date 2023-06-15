@@ -13,7 +13,12 @@ function createCostFunction(code: string): CostFunction<string> {
   const tree = parse(code);
   const hasRule = toQuerier(tree);
 
-  return (s: Sequence<string>, t: Sequence<string>, i: number, j: number) => {
+  return function customCost(
+    s: Sequence<string>,
+    t: Sequence<string>,
+    i: number,
+    j: number
+  ) {
     const a = s[i] || "";
     const b = t[j] || "";
 

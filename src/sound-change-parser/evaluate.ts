@@ -108,7 +108,11 @@ export function toQuerier(tree: Ruleset[]): Querier {
   };
 
   // Check if sound change appears in the ruleset.
-  return (a: string, b: string, options: QueryOptions = defaultOptions) => {
+  return function querier(
+    a: string,
+    b: string,
+    options: QueryOptions = defaultOptions
+  ) {
     const left = options.context?.left || "*";
     const right = options.context?.right || "*";
     let contexts = [`${left} ${right}`, `${left} *`, `* ${right}`, "* *"];
