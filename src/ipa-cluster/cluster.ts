@@ -33,22 +33,29 @@ export function cluster(
   const optics = new OPTICS();
   const indices = dataset.map((_, index: number) => index);
 
+  // Pre-compute all distances.
   const cache: Map<string, number> = new Map();
+  for (const [i, a] of dataset.entries()) {
+    const ipaA = a.ipa.split(" ");
+
+    for (let j = 0; j < i; ++j) {
+      const b = dataset[j];
+      const ipaB = b.ipa.split(" ");
+
+      const key = `${j} ${i}`;
+      const value = metric(ipaA, ipaB);
+      cache.set(key, value);
+    }
+  }
+
   const newMetric = (i: number, j: number) => {
     if (i === j) {
       return 0;
     }
-
-    [i, j] = [Math.min(i, j), Math.max(i, j)];
-    const key = `${i} ${j}`;
-    if (!cache.has(key)) {
-      const a = dataset[i];
-      const b = dataset[j];
-      const value = metric(a.ipa.split(" "), b.ipa.split(" "));
-      cache.set(key, value);
-      return value;
+    if (j < i) {
+      [i, j] = [j, i];
     }
-    return cache.get(key);
+    return cache.get(`${i} ${j}`);
   };
   // @types/density-clustering seems to have a bug.
   // @ts-ignore
