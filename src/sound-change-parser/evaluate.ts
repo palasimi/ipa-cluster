@@ -27,13 +27,13 @@ function toEnvironmentString(environment: Environment): string[] {
   const afters = toSoundString(environment.after);
 
   // Because each side of a sound change rule may contain a class of sounds.
-  const keys = [];
+  const keys: Set<string> = new Set();
   for (const before of befores) {
     for (const after of afters) {
-      keys.push(`${before} _ ${after}`);
+      keys.add(`${before} _ ${after}`);
     }
   }
-  return Array.from(new Set(keys));
+  return Array.from(keys);
 }
 
 // Converts parse tree into a map that can be used to query the existence of a
