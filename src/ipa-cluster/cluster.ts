@@ -31,12 +31,22 @@ export function cluster(
   const minPoints = 2;
 
   const optics = new OPTICS();
+  const indices = dataset.map((_, index: number) => index);
 
-  const newMetric = (a: Data, b: Data) => {
-    return metric(a.ipa.split(" "), b.ipa.split(" "));
+  const cache: Map<string, number> = new Map();
+  const newMetric = (i: number, j: number) => {
+    [i, j] = [Math.min(i, j), Math.max(i, j)];
+    const key = `${i} ${j}`;
+    if (!cache.has(key)) {
+      const a = dataset[i];
+      const b = dataset[j];
+      const value = metric(a.ipa.split(" "), b.ipa.split(" "));
+      cache.set(key, value);
+    }
+    return cache.get(key);
   };
   // @types/density-clustering seems to have a bug.
   // @ts-ignore
-  const clusters = optics.run(dataset, epsilon, minPoints, newMetric);
-  return clusters.map((indices: number[]) => indices.map((i) => dataset[i]));
+  const clusters = optics.run(indices, epsilon, minPoints, newMetric);
+  return clusters.map((group: number[]) => group.map((i) => dataset[i]));
 }
