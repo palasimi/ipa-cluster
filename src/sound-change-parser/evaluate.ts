@@ -20,9 +20,9 @@ function toSoundString(sound: Sound): string[] {
   }
 }
 
-// Convert the environment into an array of distinct map keys.
-// Returns an empty array if the environment is invalid.
-function toEnvironmentString(environment: Environment): string[] {
+// Convert the environment into a set of distinct map keys.
+// Returns an empty sete if the environment is invalid.
+function toEnvironmentString(environment: Environment): Set<string> {
   const befores = toSoundString(environment.before);
   const afters = toSoundString(environment.after);
 
@@ -33,51 +33,43 @@ function toEnvironmentString(environment: Environment): string[] {
       keys.add(`${before} _ ${after}`);
     }
   }
-  return Array.from(keys);
+  return keys;
 }
 
 // Converts parse tree into a map that can be used to query the existence of a
 // sound change.
-// The result is a map: language pair -> environment -> set of sound pairs.
-function toMap(tree: Ruleset[]): Map<string, Map<string, Set<string>>> {
-  const contextMap = new Map();
-
+// The result is a map: sound pair -> set of defined constraints (language and
+// environment info).
+function toMap(tree: Ruleset[]): Map<string, Set<string>> {
+  const sounds = new Map();
   for (const ruleset of tree) {
-    let [left, right] = ruleset.context;
-
-    // Whether to reverse order of languages or not.
-    const reverse = right < left;
-    if (reverse) {
-      [left, right] = [right, left];
-    }
-
-    const context = `${left} ${right}`;
-    if (!contextMap.has(context)) {
-      contextMap.set(context, new Map());
-    }
-
-    const environmentMap = contextMap.get(context);
+    const [left, right] = ruleset.context;
 
     for (const rule of ruleset.rules) {
-      // Expand classes in environment.
-      for (const environment of toEnvironmentString(rule.environment)) {
-        if (!environmentMap.has(environment)) {
-          environmentMap.set(environment, new Set());
-        }
+      // Expand classes in environment constraint.
+      const environments = toEnvironmentString(rule.environment);
 
-        const pairSet = environmentMap.get(environment);
-        // Expand classes in sound expressions.
-        for (const lhs of toSoundString(rule.lhs)) {
-          for (const rhs of toSoundString(rule.rhs)) {
-            const pair = reverse ? `${rhs} -> ${lhs}` : `${lhs} -> ${rhs}`;
-            pairSet.add(pair);
+      // Expand classes in sound change rule.
+      for (const lhs of toSoundString(rule.lhs)) {
+        for (const rhs of toSoundString(rule.rhs)) {
+          // We make sure that the sound pair is sorted lexicographically, and
+          // that the language info is aligned properly.
+          const reverse = lhs > rhs;
+          const context = reverse ? `${right} ${left}` : `${left} ${right}`;
+          const key = reverse ? `${rhs} -> ${lhs}` : `${lhs} -> ${rhs}`;
+          if (!sounds.has(key)) {
+            sounds.set(key, new Set());
+          }
+
+          const set = sounds.get(key);
+          for (const environment of environments) {
+            set.add(`${context} / ${environment}`);
           }
         }
       }
     }
   }
-
-  return contextMap;
+  return sounds;
 }
 
 export type QueryOptions = {
@@ -102,7 +94,7 @@ export type Querier = (a: string, b: string, options?: QueryOptions) => boolean;
 
 // Turn the parse tree into a query function.
 export function toQuerier(tree: Ruleset[]): Querier {
-  const contextMap = toMap(tree);
+  const ruleMap = toMap(tree);
 
   // Memoize query function, because it's expected to be called a lot.
   // Only global sound changes (no context or environment constraints) will be
@@ -119,20 +111,27 @@ export function toQuerier(tree: Ruleset[]): Querier {
     const after = options.environment?.after || "";
 
     // Fix order of options.
-    const reverse = right < left;
+    const reverse = a > b;
     if (reverse) {
       [a, b] = [b, a];
       [left, right] = [right, left];
     }
+    const key = `${a} -> ${b}`;
 
     // Check cache.
     // Note that only queries with no constraints are cached, so the order of
     // segments in the key don't have to match the order of languages.
-    const key = a < b ? `${a} ${b}` : `${b} ${a}`;
     if (cache.has(key)) {
       return true;
     }
 
+    // Get set of constraints.
+    const set = ruleMap.get(key);
+    if (set == null) {
+      return false;
+    }
+
+    // Construct keys for set of constraints.
     const contexts = ["* *"];
     if (left !== "*") {
       contexts.push(`${left} *`);
@@ -155,31 +154,16 @@ export function toQuerier(tree: Ruleset[]): Querier {
       environments.push(`${before} _ ${after}`);
     }
 
-    const pairs = [`${a} -> ${b}`];
-    // If there are no language constraints, also insert the reverse.
-    if (contexts.length === 1) {
-      pairs.push(`${b} -> ${a}`);
-    }
-
+    // Check if rule is defined for the constraint.
     for (const context of contexts) {
-      const environmentMap = contextMap.get(context);
-      if (environmentMap == null) {
-        continue;
-      }
-
       for (const environment of environments) {
-        const pairSet = environmentMap.get(environment);
-        if (pairSet == null) {
-          continue;
-        }
-        for (const pair of pairs) {
-          if (pairSet.has(pair)) {
-            // Save in cache if the query has no constraints.
-            if (context === "* *" && environment === " _ ") {
-              cache.add(key);
-            }
-            return true;
+        const constraint = `${context} / ${environment}`;
+        if (set.has(constraint)) {
+          // Save in cache if the query has no constraints.
+          if (context === "* *" && environment === " _ ") {
+            cache.add(key);
           }
+          return true;
         }
       }
     }
