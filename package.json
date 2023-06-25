@@ -4,16 +4,16 @@
   "description": "Cluster words with similar IPA transcriptions together",
   "main": "dist/index.js",
   "scripts": {
-    "build": "esbuild --bundle --minify --outdir=dist --sourcemap --target=es6 src/index.ts",
-    "build:demo": "esbuild --bundle --outdir=build --target=es6 --platform=node scripts/demo.ts",
-    "check": "npm run typecheck && npm run lint && npm run format && npm run test:cov",
+    "build": "tsc --declaration --declarationMap --sourceMap --strict --module commonjs --outDir build --target es6 src/index.ts scripts/demo.ts",
+    "check": "npm run format && npm run typecheck && npm run lint && npm run test:cov",
+    "dist": "npm run build && rm -rf dist && cp -r build/src dist",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint": "eslint src test",
     "lint:fix": "eslint --fix src test",
     "test": "mocha",
     "test:cov": "nyc mocha",
-    "typecheck": "tsc"
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,6 @@
     "@types/mocha": "^10.0.1",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
-    "esbuild": "^0.18.1",
     "eslint": "^8.42.0",
     "fast-check": "^3.10.0",
     "mocha": "^10.2.0",
