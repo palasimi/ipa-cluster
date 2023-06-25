@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Cluster words with similar IPA transcriptions together",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --declaration --declarationMap --sourceMap --strict --module commonjs --outDir build --target es6 src/index.ts scripts/demo.ts",
     "check": "npm run format && npm run typecheck && npm run lint && npm run test:cov",
