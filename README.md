@@ -5,10 +5,16 @@ Cluster words with similar IPA transcriptions together.
 Similar, in this context, means that the edit distance of the IPA transcriptions is small enough.
 The [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) is used to measure this distance.
 
+## Installation
+
+```bash
+npm install @palasimi/ipa-cluster
+```
+
 ## Basic example
 
 ```typescript
-import { clusterByIPA } from "ipa-cluster";
+import { clusterByIPA } from "@palasimi/ipa-cluster";
 
 // The IPA transcriptions should be tokenized.
 const dataset = [{ ipa: "f uː" }, { ipa: "b ɑː r" }, { ipa: "b ɑː z" }];
