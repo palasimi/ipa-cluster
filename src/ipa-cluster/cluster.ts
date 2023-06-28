@@ -2,6 +2,7 @@
 // Copyright (c) 2023 Levi Gruspe
 
 import { dbscan } from "./dbscan";
+import { precompute } from "./utils";
 
 export type Data = {
   // Space-separated list of segments.
@@ -46,10 +47,13 @@ export function cluster(
     };
   });
 
+  const precomputedDistance = precompute(tokenized, metric);
+  const indices = tokenized.map((_, i) => i);
+
   const epsilon =
     options.epsilon != null ? options.epsilon : defaultOptions.epsilon;
 
-  const clusters = dbscan(tokenized, epsilon, metric);
+  const clusters = dbscan(indices, epsilon, precomputedDistance);
 
   // Convert indices to values.
   return clusters.map((cluster) => cluster.map((i) => dataset[i]));
