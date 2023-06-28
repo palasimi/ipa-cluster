@@ -29,8 +29,7 @@ export type ClusterOptions = {
 };
 
 const defaultOptions = {
-  // Words in the same cluster can differ by up to 1 edit.
-  epsilon: 1.1,
+  epsilon: 2,
   minPoints: 2,
 };
 
