@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2023 Levi Gruspe
 
-import { dbscan } from "./dbscan";
+import { dbscan, suggestEpsilon } from "./dbscan";
 import { precompute } from "./utils";
 
 export type Data = {
@@ -28,11 +28,6 @@ export type ClusterOptions = {
   minPoints?: number;
 };
 
-const defaultOptions = {
-  epsilon: 2,
-  minPoints: 2,
-};
-
 // Cluster words with similar IPA transcriptions together.
 export function cluster(
   dataset: Data[],
@@ -51,8 +46,9 @@ export function cluster(
   const indices = tokenized.map((_, i) => i);
 
   const epsilon =
-    options.epsilon != null ? options.epsilon : defaultOptions.epsilon;
-
+    options.epsilon != null
+      ? options.epsilon
+      : suggestEpsilon(indices, precomputedDistance);
   const clusters = dbscan(indices, epsilon, precomputedDistance);
 
   // Convert indices to values.

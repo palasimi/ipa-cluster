@@ -14,7 +14,7 @@ describe("cluster", () => {
   it("smoke test", () => {
     const dataset = [{ ipa: "f o o" }, { ipa: "b a r" }, { ipa: "b a z" }];
     const metric = (p: Point, q: Point) => levenshtein(p.ipa, q.ipa);
-    const clusters = cluster(dataset, metric);
+    const clusters = cluster(dataset, metric, { epsilon: 2 });
     clusters.sort((a: Data[], b: Data[]) => a.length - b.length);
 
     // The clusters should be foo and bar-baz.

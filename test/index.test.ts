@@ -12,7 +12,7 @@ describe("clusterByIPA", () => {
 
   describe("without ignores", () => {
     it("should penalize unequal IPA segments", () => {
-      const clusters = clusterByIPA(dataset);
+      const clusters = clusterByIPA(dataset, { epsilon: 2 });
       assert.equal(clusters.length, 3);
     });
   });
@@ -25,7 +25,7 @@ describe("clusterByIPA", () => {
         w -> s
         e -> d
       `;
-      const clusters = clusterByIPA(dataset, { ignores });
+      const clusters = clusterByIPA(dataset, { ignores, epsilon: 2 });
       clusters.sort((a: Data[], b: Data[]) => a.length - b.length);
 
       // The ignore list is written to cause "qwe" and "asd" to be clustered
