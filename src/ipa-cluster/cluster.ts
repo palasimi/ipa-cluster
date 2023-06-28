@@ -24,8 +24,8 @@ export type Point = {
 export type Metric = (p: Point, q: Point) => number;
 
 export type ClusterOptions = {
-  epsilon: number;
-  minPoints: number;
+  epsilon?: number;
+  minPoints?: number;
 };
 
 const defaultOptions = {
@@ -38,7 +38,7 @@ const defaultOptions = {
 export function cluster(
   dataset: Data[],
   metric: Metric,
-  options: ClusterOptions = defaultOptions
+  options: ClusterOptions = {}
 ): Data[][] {
   // Pre-compute all distances.
   const cache: Map<string, number> = new Map();
@@ -73,8 +73,10 @@ export function cluster(
     return cache.get(`${i} ${j}`);
   };
 
-  const epsilon = options.epsilon;
-  const minPoints = options.minPoints;
+  const epsilon =
+    options.epsilon != null ? options.epsilon : defaultOptions.epsilon;
+  const minPoints =
+    options.minPoints != null ? options.minPoints : defaultOptions.minPoints;
 
   const optics = new OPTICS();
   const indices = dataset.map((_, index: number) => index);

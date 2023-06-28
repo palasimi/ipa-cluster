@@ -16,25 +16,15 @@ export type ClusterByIPAOptions = {
   ignores?: string;
 };
 
-const defaultOptions = {
-  epsilon: 1.1,
-  minPoints: 2,
-  ignores: "",
-};
-
 // Cluster words with similar IPA transcriptions together.
 // Uses the OPTICS clustering algorithm and the Levenshtein distance function.
 // `ignores` specifies edits/sound changes to not penalize.
 // May raise `ParseError`.
 export function clusterByIPA(
   dataset: Data[],
-  options: ClusterByIPAOptions = defaultOptions
+  options: ClusterByIPAOptions = {}
 ): Data[][] {
-  const epsilon = options?.epsilon || defaultOptions.epsilon;
-  const minPoints = options?.minPoints || defaultOptions.minPoints;
-  const ignores = options?.ignores || "";
-
-  const cost = createCostFunction(ignores);
+  const cost = createCostFunction(options?.ignores || "");
   const metric = (p: Point, q: Point) => {
     const options = {
       left: p.language,
@@ -42,5 +32,5 @@ export function clusterByIPA(
     };
     return levenshtein(p.ipa, q.ipa, cost, options);
   };
-  return cluster(dataset, metric, { epsilon, minPoints });
+  return cluster(dataset, metric, options);
 }
