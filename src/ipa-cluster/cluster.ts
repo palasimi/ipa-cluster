@@ -25,11 +25,13 @@ export type Metric = (p: Point, q: Point) => number;
 
 export type ClusterOptions = {
   epsilon: number;
+  minPoints: number;
 };
 
 const defaultOptions = {
   // Words in the same cluster can differ by up to 1 edit.
   epsilon: 1.1,
+  minPoints: 2,
 };
 
 // Cluster words with similar IPA transcriptions together.
@@ -72,7 +74,7 @@ export function cluster(
   };
 
   const epsilon = options.epsilon;
-  const minPoints = 2;
+  const minPoints = options.minPoints;
 
   const optics = new OPTICS();
   const indices = dataset.map((_, index: number) => index);

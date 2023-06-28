@@ -55,12 +55,16 @@ export type ClusterByIPAOptions = {
   // Same as `epsilon` option to `cluster`.
   epsilon?: number;
 
+  // Same as `minPoints` option to `cluster`.
+  minPoints?: number;
+
   // Sound changes to ignore penalties for.
   ignores?: string;
 };
 
 const defaultOptions = {
   epsilon: 1.1,
+  minPoints: 2,
   ignores: "",
 };
 
@@ -73,6 +77,7 @@ export function clusterByIPA(
   options: ClusterByIPAOptions = defaultOptions
 ): Data[][] {
   const epsilon = options?.epsilon || defaultOptions.epsilon;
+  const minPoints = options?.minPoints || defaultOptions.minPoints;
   const ignores = options?.ignores || "";
 
   const cost = createCostFunction(ignores);
@@ -83,5 +88,5 @@ export function clusterByIPA(
     };
     return levenshtein(p.ipa, q.ipa, cost, options);
   };
-  return cluster(dataset, metric, { epsilon });
+  return cluster(dataset, metric, { epsilon, minPoints });
 }
