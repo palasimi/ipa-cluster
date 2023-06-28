@@ -42,4 +42,17 @@ describe("levenshtein", () => {
       );
     });
   });
+
+  // Don't delete this test. It's useful for finding off-by-one errors.
+  describe("when input strings are the same except for one character", () => {
+    it("should return 1", () => {
+      fc.assert(
+        fc.property(fc.string(), (data: string) => {
+          const first = "a" + data;
+          const second = "b" + data;
+          assert.equal(levenshtein(first, second), 1);
+        })
+      );
+    });
+  });
 });
