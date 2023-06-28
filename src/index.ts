@@ -9,9 +9,6 @@ export type ClusterByIPAOptions = {
   // Same as `epsilon` option to `cluster`.
   epsilon?: number;
 
-  // Same as `minPoints` option to `cluster`.
-  minPoints?: number;
-
   // Sound changes to ignore penalties for.
   ignores?: string;
 };

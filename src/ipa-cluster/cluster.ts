@@ -25,7 +25,6 @@ export type Metric = (p: Point, q: Point) => number;
 
 export type ClusterOptions = {
   epsilon?: number;
-  minPoints?: number;
 };
 
 // Cluster words with similar IPA transcriptions together.
