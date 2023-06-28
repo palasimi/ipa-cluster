@@ -22,6 +22,30 @@ describe("levenshtein", () => {
     );
   });
 
+  it("should not exceed the length of the longer string", () => {
+    fc.assert(
+      fc.property(
+        fc.tuple(fc.string(), fc.string()),
+        (data: [string, string]) => {
+          const [s, t] = data;
+          assert.ok(levenshtein(s, t) <= Math.max(s.length, t.length));
+        }
+      )
+    );
+  });
+
+  it("should satisfy the triangle inequality", () => {
+    fc.assert(
+      fc.property(
+        fc.tuple(fc.string(), fc.string(), fc.string()),
+        (data: [string, string, string]) => {
+          const [a, b, c] = data;
+          assert.ok(levenshtein(a, b) + levenshtein(b, c) >= levenshtein(a, c));
+        }
+      )
+    );
+  });
+
   describe("when one string is empty", () => {
     it("should return the length of the other string", () => {
       fc.assert(
