@@ -34,4 +34,25 @@ describe("clusterByIPA", () => {
       assert.deepEqual(clusters[0], [{ ipa: "z x c" }]);
     });
   });
+
+  it("should return the same values from the input", () => {
+    const dataset = [
+      { id: 0, ipa: "q w e" },
+      { id: 1, ipa: "a s d" },
+      { id: 2, ipa: "z x c" },
+    ];
+    const clusters = clusterByIPA(dataset, { epsilon: 0 });
+
+    assert.equal(clusters.length, 3);
+    const results = new Map();
+    for (const cluster of clusters) {
+      for (const data of cluster) {
+        results.set(data.id, data);
+      }
+    }
+
+    for (const data of dataset) {
+      assert.equal(data, results.get(data.id));
+    }
+  });
 });

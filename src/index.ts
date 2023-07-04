@@ -17,10 +17,10 @@ export type ClusterByIPAOptions = {
 // Uses the OPTICS clustering algorithm and the Levenshtein distance function.
 // `ignores` specifies edits/sound changes to not penalize.
 // May raise `ParseError`.
-export function clusterByIPA(
-  dataset: Data[],
+export function clusterByIPA<T extends Data>(
+  dataset: T[],
   options: ClusterByIPAOptions = {}
-): Data[][] {
+): T[][] {
   const cost = createCostFunction(options?.ignores || "");
   const metric = (p: Point, q: Point) => {
     const options = {

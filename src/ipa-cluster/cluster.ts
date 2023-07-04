@@ -28,11 +28,11 @@ export type ClusterOptions = {
 };
 
 // Cluster words with similar IPA transcriptions together.
-export function cluster(
-  dataset: Data[],
+export function cluster<T extends Data>(
+  dataset: T[],
   metric: Metric,
   options: ClusterOptions = {}
-): Data[][] {
+): T[][] {
   // Tokenize dataset.
   const tokenized = dataset.map((p) => {
     return {
