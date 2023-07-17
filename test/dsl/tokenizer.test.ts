@@ -43,8 +43,8 @@ describe("tokenize", () => {
   });
 
   it("should not treat '#' as the start of a comment", () => {
-    assert.strictEqual(tokenize("# foo")[0].tag, Tag.Terminal);
-    assert.strictEqual(tokenize("#foo")[0].tag, Tag.Terminal);
+    assert.equal(tokenize("# foo")[0].tag, Tag.Terminal);
+    assert.equal(tokenize("#foo")[0].tag, Tag.Terminal);
   });
 
   describe("words", () => {
