@@ -28,8 +28,9 @@ export class ParseError extends Error {}
 
 /**
  * Code parser.
+ * Exported only for testing.
  */
-class Parser {
+export class Parser {
   private tokens: Token[];
   private index = 0;
   private scope: Scope<Sound> = new Scope();
@@ -399,6 +400,9 @@ class Parser {
    * Returns an array of `Rule`s.
    */
   parseMultiLineRule(): Rule[] {
+    // Enter new scope.
+    this.scope = new Scope(this.scope);
+
     const rules = [];
 
     for (;;) {
@@ -415,6 +419,9 @@ class Parser {
         this.move();
       }
     }
+
+    // Leave scope.
+    this.scope = this.scope.outer as Scope<Sound>;
     return rules;
   }
 
@@ -426,6 +433,11 @@ class Parser {
    */
   parseCompoundStatement(): Ruleset {
     const constraint = this.parseConstraint();
+
+    // Ignore newline.
+    if (this.peek()?.tag === Tag.Newline) {
+      this.move();
+    }
 
     const rules = [];
     const lookahead = this.peek();
