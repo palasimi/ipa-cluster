@@ -48,6 +48,52 @@ describe("tokenize", () => {
   });
 
   describe("words", () => {
+    describe("if word looks like a variable name", () => {
+      it("should be tagged as a variable", () => {
+        const examples = [
+          "A",
+          "B",
+          "C",
+          "Foo",
+          "Bar",
+          "Baz",
+          "A1",
+          "X1",
+          "Y2",
+          "Z3",
+        ];
+        for (const example of examples) {
+          const tokens = tokenize(example);
+          assert.equal(tokens.length, 1);
+
+          const token = tokens[0];
+          assert.equal(token.tag, Tag.Variable);
+          assert.equal(token.literal, example);
+        }
+      });
+    });
+
+    describe("if word does not look like a variable name", () => {
+      it("should be tagged as a terminal", () => {
+        const examples = [
+          "qwerty",
+          "asdf",
+          "foo",
+          "bar",
+          "baz",
+          "Aä", // not a variable, because it's not ASCII alphanumeric
+        ];
+        for (const example of examples) {
+          const tokens = tokenize(example);
+          assert.equal(tokens.length, 1);
+
+          const token = tokens[0];
+          assert.equal(token.tag, Tag.Terminal);
+          assert.equal(token.literal, example);
+        }
+      });
+    });
+
     it("should break words at reserved symbols", () => {
       const examples: Array<[string, string[]]> = [
         ["!foo!bar!baz!", ["!", "foo", "!", "bar", "!", "baz", "!"]],
