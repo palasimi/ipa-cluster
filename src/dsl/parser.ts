@@ -202,14 +202,12 @@ class Parser {
           sounds.push(this.parseSound());
           break;
         default:
-          break;
+          if (sounds.length === 0) {
+            abort(lookahead, "expected a sound value");
+          }
+          return sounds;
       }
     }
-
-    if (sounds.length === 0) {
-      abort(this.peek(), "expected a sound value");
-    }
-    return sounds;
   }
 
   /**
@@ -460,7 +458,7 @@ class Parser {
     // statement.
     const lookahead = this.peekN(3);
     const dot = lookahead.findIndex((token) => token.tag === Tag.Dot);
-    if (dot < 0) {
+    if (dot >= 0) {
       return this.parseCompoundStatement();
     }
     return createUnconstrainedRuleset(this.parseSimpleStatement());
