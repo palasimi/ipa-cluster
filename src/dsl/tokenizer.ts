@@ -3,11 +3,14 @@
 // Code tokenizer.
 
 /**
+ * Exception thrown by `Tokenizer` when it runs out of tokens.
+ */
+export class EOFError extends Error {}
+
+/**
  * Represents a type of token.
  */
 export enum Tag {
-  EOF,
-
   Dot,
   Equals,
   LeftBrace,
@@ -34,6 +37,68 @@ export type Token = {
   tag: Tag;
   literal: string;
 };
+
+/**
+ * Map of seperator symbols and their corresponding tags.
+ */
+const separators = new Map([
+  [".", Tag.Dot],
+  ["/", Tag.Slash],
+  ["=", Tag.Equals],
+  ["\n", Tag.Newline],
+  ["{", Tag.LeftBrace],
+  ["|", Tag.Pipe],
+  ["}", Tag.RightBrace],
+  ["~", Tag.Tilde],
+]);
+
+/**
+ * Set of reserved symbols.
+ * These symbols aren't used yet by the language.
+ */
+const reserved = new Set([
+  "!",
+  "$",
+  "%",
+  "&",
+  "'",
+  "(",
+  ")",
+  "*",
+  "+",
+  ",",
+  "-",
+  ":",
+  ";",
+  "<",
+  ">",
+  "?",
+  "@",
+  "[",
+  "\\",
+  "]",
+  "^",
+  "`",
+  '"',
+]);
+
+/**
+ * Special terminal symbols.
+ * These symbols are not allowed to be a substring in variable names and other
+ * terminal symbols (e.g. IPA segments).
+ */
+const terminals = new Set(["#", "_"]);
+
+/**
+ * Set of word breakpoints.
+ * These symbols cannot be used in strings and variable names.
+ */
+const breakpoints = new Set([
+  "",
+  ...reserved,
+  ...separators.keys(),
+  ...terminals,
+]);
 
 /**
  * Code tokenizer.
@@ -89,10 +154,10 @@ class Tokenizer {
   }
 
   /**
-   * Moves the pointer past the next space-delimited word.
+   * Moves the pointer past the next word breakpoint.
    * Returns the string in-between (stripped of whitespace) as a token.
    */
-  private moveUntilSpace(): Token {
+  private moveUntilBreakpoint(): Token {
     while (isSpace(this.peek())) {
       this.move();
     }
@@ -103,13 +168,9 @@ class Tokenizer {
     const chars = [];
     for (;;) {
       const char = this.peek();
-
-      // We explicitly check for newlines, because `isSpace` doesn't consider
-      // it a space character.
-      if (char === "" || char === "\n" || isSpace(char)) {
+      if (isSpace(char) || breakpoints.has(char)) {
         break;
       }
-
       chars.push(char);
       this.move();
     }
@@ -158,103 +219,78 @@ class Tokenizer {
   }
 
   /**
-   * Emits a space-delimited token (e.g. variable name or string).
+   * Emits a word (e.g. strings and variables).
    */
-  private emitSpaceDelimited(): Token {
-    return this.moveUntilSpace();
+  private emitWord(): Token {
+    return this.moveUntilBreakpoint();
   }
 
   /**
    * Emits the next token in the code.
+   * Throws an `EOFError` if there are no tokens left.
    */
   nextToken(): Token {
-    if (this.isDone()) {
-      return this.createToken(Tag.EOF, "");
-    }
-
+    // Remove insignificant whitespace.
     while (isSpace(this.peek())) {
       this.move();
     }
 
-    switch (this.peek()) {
-      // Separators.
-      case ".":
-        return this.emit(Tag.Dot, ".");
-      case "/":
-        return this.emit(Tag.Slash, "/");
-      case "=":
-        return this.emit(Tag.Equals, "=");
-      case "\n":
-        return this.emit(Tag.Newline, "\n");
-      case "{":
-        return this.emit(Tag.LeftBrace, "{");
-      case "|":
-        return this.emit(Tag.Pipe, "|");
-      case "}":
-        return this.emit(Tag.RightBrace, "}");
-      case "~":
-        return this.emit(Tag.Tilde, "~");
-
-      // Special terminals.
-      case "#":
-        return this.emit(Tag.Terminal, "#");
-      case "_":
-        return this.emit(Tag.Terminal, "_");
-
-      // Reserved symbols.
-      // These symbols aren't used yet.
-      case "!":
-      case "$":
-      case "%":
-      case "&":
-      case "'":
-      case "(":
-      case ")":
-      case "*":
-      case "+":
-      case ",":
-      case ":":
-      case ";":
-      case "<":
-      case ">":
-      case "?":
-      case "@":
-      case "[":
-      case "\\":
-      case "]":
-      case "^":
-      case "`":
-      case '"':
-        return this.emit(Tag.Reserved, "");
-
-      // Ignore comments.
-      case "-":
-        if (this.peek(1) === "-") {
-          this.skip();
-          return this.nextToken();
-        }
-        return this.emit(Tag.Reserved, "-");
-
-      // Space-delimited tokens.
-      default:
-        return this.emitSpaceDelimited();
+    // Check if there are tokens left.
+    if (this.isDone()) {
+      throw new EOFError();
     }
+
+    const lookahead = this.peek();
+
+    // Ignore comments.
+    if (lookahead === "-") {
+      if (this.peek(1) === "-") {
+        this.skip();
+        return this.nextToken();
+      }
+      return this.emit(Tag.Reserved, "-");
+    }
+
+    // Reserved symbols.
+    // It's important to ignore comments before checking for reserved symbols,
+    // because "-" is also a reserved symbol.
+    if (reserved.has(lookahead)) {
+      return this.emit(Tag.Reserved, lookahead);
+    }
+
+    // Separators.
+    if (separators.has(lookahead)) {
+      return this.emit(separators.get(lookahead) as Tag, lookahead);
+    }
+
+    // Special terminal symbols.
+    if (terminals.has(lookahead)) {
+      return this.emit(Tag.Terminal, lookahead);
+    }
+
+    // Variable names and terminals.
+    return this.emitWord();
   }
 }
 
 /**
  * Tokenizes code.
- * Emits `Token`s.
+ * Returns an array of `Token`s.
  */
-export function* tokenize(code: string, infinite = false): Iterable<Token> {
+export function tokenize(code: string): Token[] {
+  const tokens = [];
   const tokenizer = new Tokenizer(code);
   for (;;) {
-    const token = tokenizer.nextToken();
-    if (token.tag === Tag.EOF && !infinite) {
-      break;
+    try {
+      tokens.push(tokenizer.nextToken());
+    } catch (error) {
+      if (error instanceof EOFError) {
+        break;
+      }
+      throw error;
     }
-    yield token;
   }
+  return tokens;
 }
 
 /**
@@ -262,8 +298,11 @@ export function* tokenize(code: string, infinite = false): Iterable<Token> {
  * Since newlines are significant, we won't treat them as whitespace.
  */
 function isSpace(text: string): boolean {
-  const re = /[^\s]|\n/;
-  return !re.test(text);
+  if (text === "\n") {
+    return false;
+  }
+  const re = /^\s+$/;
+  return re.test(text);
 }
 
 /**
@@ -272,6 +311,6 @@ function isSpace(text: string): boolean {
  * symbols.
  */
 function isName(text: string): boolean {
-  const re = /^[A-Z][A-Za-z0-9]$/;
+  const re = /^[A-Z][A-Za-z0-9]*$/;
   return re.test(text);
 }
