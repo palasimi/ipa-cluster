@@ -140,9 +140,9 @@ describe("Scope", () => {
   describe("resolve", () => {
     describe("when variable is not defined in any scope", () => {
       it("should throw `NameError`", () => {
-        // TODO NameError
         const scope = new Scope();
         assert.throws(() => scope.resolve("foo"), {
+          name: "NameError",
           message: /foo.*not defined/,
         });
       });

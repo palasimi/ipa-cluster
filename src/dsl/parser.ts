@@ -24,7 +24,12 @@ import { Tag, Token, tokenize } from "./tokenizer";
 /**
  * Exception thrown by parser when it encounters an error during parsing.
  */
-export class ParseError extends Error {}
+export class ParseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
 
 /**
  * Code parser.

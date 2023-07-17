@@ -17,6 +17,7 @@ describe("parse", () => {
           A = b
         `;
         assert.throws(() => parse(code), {
+          name: "ParseError",
           message: /cannot redefine the variable/,
         });
       });

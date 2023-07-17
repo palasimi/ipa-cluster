@@ -5,7 +5,12 @@
 /**
  * Exception thrown by `Scope` when trying to resolve an undefined variable.
  */
-export class NameError extends Error {}
+export class NameError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
 
 /**
  * Represents a scope of variable definitions.
