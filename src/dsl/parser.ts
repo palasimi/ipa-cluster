@@ -213,30 +213,6 @@ export class Parser {
   }
 
   /**
-   * Parses the sound to the left of "_" in a sound environment.
-   * It may be empty.
-   */
-  parseLeftEnvironment(): Sound {
-    const lookahead = this.peek();
-    if (lookahead?.tag === Tag.Underscore) {
-      return createTerminalSound("_");
-    }
-    return this.parseSound();
-  }
-
-  /**
-   * Parses the sound to the right of "_" in a sound environment.
-   * It may be empty.
-   */
-  parseRightEnvironment(): Sound {
-    const lookahead = this.peek();
-    if (lookahead?.tag === Tag.Newline) {
-      return createTerminalSound("_");
-    }
-    return this.parseSound();
-  }
-
-  /**
    * Parses the sound environment of a rule.
    * In general, a sound environment can be written as `/ A _ B`,
    * where `A` and `B` are sound values.
@@ -257,10 +233,9 @@ export class Parser {
 
     this.expect(Tag.Slash, "expected '/'");
 
-    // TODO allow target be surrounded by multiple sounds
-    const left = [this.parseLeftEnvironment()];
+    const left = this.parseSounds();
     this.expect(Tag.Underscore, "expected '_'");
-    const right = [this.parseRightEnvironment()];
+    const right = this.parseSounds();
     return { left, right, explicit: true };
   }
 

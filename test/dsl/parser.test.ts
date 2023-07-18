@@ -36,7 +36,7 @@ describe("parse", () => {
         it("should be an error", () => {
           assert.throws(() => parse(".~"), {
             name: "ParseError",
-            message: "expected a language code",
+            message: /expected a language code/,
           });
         });
       });
@@ -74,6 +74,18 @@ describe("parse", () => {
     });
 
     describe("with a sound environment", () => {
+      describe("with multiple surrounding sounds", () => {
+        it("should be okay", () => {
+          const code = `
+            a ~ b / _
+            a ~ b / _ e f
+            a ~ b / c d _
+            a ~ b / c d _ e f
+          `;
+          parse(code);
+        });
+      });
+
       describe("without '_'", () => {
         it("should be an error", () => {
           assert.throws(() => parse("a ~ b / c"), {
