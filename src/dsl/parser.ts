@@ -288,20 +288,6 @@ export class Parser {
         }
       }
     }
-
-    // Disallow "_" outside of an environment.
-    // TODO are these checks necessary?
-    for (const sound of left) {
-      if (sound.tag === SoundTag.Terminal && sound.value === "_") {
-        abort(leftToken as Token, "unexpected '_'");
-      }
-    }
-    for (const sound of right) {
-      if (sound.tag === SoundTag.Terminal && sound.value === "_") {
-        abort(rightToken as Token, "unexpected '_'");
-      }
-    }
-
     return { left, right, environment };
   }
 
