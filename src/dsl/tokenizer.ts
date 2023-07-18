@@ -19,6 +19,7 @@ export enum Tag {
   RightBrace,
   Slash,
   Tilde,
+  Underscore,
 
   Reserved,
 
@@ -46,6 +47,7 @@ const separators = new Map([
   ["/", Tag.Slash],
   ["=", Tag.Equals],
   ["\n", Tag.Newline],
+  ["_", Tag.Underscore],
   ["{", Tag.LeftBrace],
   ["|", Tag.Pipe],
   ["}", Tag.RightBrace],
@@ -87,7 +89,7 @@ const reserved = new Set([
  * These symbols are not allowed to be a substring in variable names and other
  * terminal symbols (e.g. IPA segments).
  */
-const terminals = new Set(["#", "_"]);
+const terminals = new Set(["#"]);
 
 /**
  * Set of word breakpoints.

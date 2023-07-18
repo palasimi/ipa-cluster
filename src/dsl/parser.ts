@@ -218,7 +218,7 @@ export class Parser {
    */
   parseLeftEnvironment(): Sound {
     const lookahead = this.peek();
-    if (lookahead?.tag === Tag.Terminal && lookahead?.literal === "_") {
+    if (lookahead?.tag === Tag.Underscore) {
       return createTerminalSound("_");
     }
     return this.parseSound();
@@ -259,12 +259,7 @@ export class Parser {
 
     // TODO allow target be surrounded by multiple sounds
     const left = [this.parseLeftEnvironment()];
-
-    const underscore = this.expect(Tag.Terminal, "expected '_'");
-    if (underscore.literal !== "_") {
-      abort(underscore, "expected '_'");
-    }
-
+    this.expect(Tag.Underscore, "expected '_'");
     const right = [this.parseRightEnvironment()];
     return { left, right, explicit: true };
   }
@@ -320,6 +315,7 @@ export class Parser {
     }
 
     // Disallow "_" outside of an environment.
+    // TODO are these checks necessary?
     for (const sound of left) {
       if (sound.tag === SoundTag.Terminal && sound.value === "_") {
         abort(leftToken as Token, "unexpected '_'");
