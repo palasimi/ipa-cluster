@@ -19,6 +19,18 @@ function languageCode() {
 }
 
 describe("parse", () => {
+  describe("SPE-style and string rewriting rules", () => {
+    it("should be equivalent", () => {
+      const codeA = "a~b/c_d";
+      const codeB = "c a d~c b d";
+
+      // The examples above should be equivalent.
+      const irA = parse(codeA);
+      const irB = parse(codeB);
+      assert.deepEqual(irA, irB);
+    });
+  });
+
   describe("rules", () => {
     describe("with empty side", () => {
       it("should be okay", () => {
