@@ -69,7 +69,6 @@ const reserved = new Set([
   "*",
   "+",
   ",",
-  "-",
   ":",
   ";",
   "<",
@@ -245,17 +244,12 @@ class Tokenizer {
     const lookahead = this.peek();
 
     // Ignore comments.
-    if (lookahead === "-") {
-      if (this.peek(1) === "-") {
-        this.skip();
-        return this.nextToken();
-      }
-      return this.emit(Tag.Reserved, "-");
+    if (lookahead === "-" && this.peek(1) === "-") {
+      this.skip();
+      return this.nextToken();
     }
 
     // Reserved symbols.
-    // It's important to ignore comments before checking for reserved symbols,
-    // because "-" is also a reserved symbol.
     if (reserved.has(lookahead)) {
       return this.emit(Tag.Reserved, lookahead);
     }
