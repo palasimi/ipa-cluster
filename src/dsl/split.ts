@@ -40,6 +40,8 @@ export type SplitIR = { rules: SplitRule[] };
 
 /**
  * Compiles an `AlignedIR` into a `SplitIR`.
+ * Splits each rule into simpler rules of the form `a ~ b`.
+ * Also rearranges rules so that the left-hand side <= the right-hand side.
  */
 export function split(ir: AlignedIR): SplitIR {
   const rules = [];
@@ -68,9 +70,42 @@ export function split(ir: AlignedIR): SplitIR {
         rightBeforeContext,
         rightAfterContext,
       };
-      rules.push(splitRule);
+      rules.push(reorder(splitRule));
     }
   }
 
   return { rules };
+}
+
+/**
+ * Reorders `left` and `rule` so that `left <= right`.
+ * The other fields are adjusted accordingly.
+ */
+function reorder(rule: SplitRule): SplitRule {
+  if (rule.left <= rule.right) {
+    return rule;
+  }
+
+  const {
+    constraint,
+    left,
+    right,
+    leftBeforeContext,
+    leftAfterContext,
+    rightBeforeContext,
+    rightAfterContext,
+  } = rule;
+
+  return {
+    constraint: {
+      left: constraint.right,
+      right: constraint.left,
+    },
+    left: right,
+    right: left,
+    leftBeforeContext: rightBeforeContext,
+    leftAfterContext: rightAfterContext,
+    rightBeforeContext: leftBeforeContext,
+    rightAfterContext: leftAfterContext,
+  };
 }
