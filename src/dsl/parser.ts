@@ -248,25 +248,24 @@ export class Parser {
     // Check if there's a slash.
     const lookahead = this.peek();
     if (lookahead?.tag !== Tag.Slash) {
-      const anySound = createTerminalSound("_");
       return {
-        left: anySound,
-        right: anySound,
+        left: [],
+        right: [],
         explicit: false,
       };
     }
 
     this.expect(Tag.Slash, "expected '/'");
 
-    // TODO can the target be surrounded by multiple sounds?
-    const left = this.parseLeftEnvironment();
+    // TODO allow target be surrounded by multiple sounds
+    const left = [this.parseLeftEnvironment()];
 
     const underscore = this.expect(Tag.Terminal, "expected '_'");
     if (underscore.literal !== "_") {
       abort(underscore, "expected '_'");
     }
 
-    const right = this.parseRightEnvironment();
+    const right = [this.parseRightEnvironment()];
     return { left, right, explicit: true };
   }
 

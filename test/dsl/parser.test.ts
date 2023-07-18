@@ -115,8 +115,8 @@ describe("parse", () => {
             left: [createTerminalSound("m")],
             right: [createTerminalSound("n")],
             environment: {
-              left: createTerminalSound("_"),
-              right: createTerminalSound("_"),
+              left: [],
+              right: [],
               explicit: false,
             },
           },
