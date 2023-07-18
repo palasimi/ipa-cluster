@@ -34,6 +34,9 @@ function pad(left: SequenceSound, right: SequenceSound): Alignment {
  */
 export type AlignedIR = ExpandedIR;
 
+/**
+ * Compiles an `ExpandedIR` into an `AlignedIR`.
+ */
 export function align(ir: ExpandedIR): AlignedIR {
   const rules = [];
   for (const { constraint, left, right } of ir.rules) {
