@@ -5,17 +5,10 @@
 import {
   Constraint,
   IR,
-  NullSound,
   Rule,
   Ruleset,
   Sound,
-  SoundTag,
-  TerminalSound,
-  UnionSound,
-  createNullSound,
-  createTerminalSound,
   createUnconstrainedRuleset,
-  createUnionSound,
 } from "./ir";
 import { NameError, Scope } from "./scopes";
 import { Tag, Token, tokenize } from "./tokenizer";
@@ -163,9 +156,9 @@ export class Parser {
   /**
    * Parses an IPA segment (a terminal).
    */
-  parseTerminalSound(): TerminalSound {
+  parseTerminalSound(): Sound {
     const terminal = this.expect(Tag.Terminal, "expected an IPA segment");
-    return createTerminalSound(terminal.literal);
+    return [terminal.literal];
   }
 
   /**
@@ -188,18 +181,14 @@ export class Parser {
    * Parses a sound value that's enclosed by braces.
    * The value may be a null sound or a union of sounds.
    */
-  parseUnionSound(): NullSound | UnionSound {
+  parseUnionSound(): Sound {
     const choices = [];
     this.expect(Tag.LeftBrace, "expected '{'");
     while (!this.isDone() && (this.peek() as Token).tag !== Tag.RightBrace) {
-      choices.push(this.parseTerminalSound());
+      choices.push(...this.parseTerminalSound());
     }
     this.expect(Tag.RightBrace, "expected '}'");
-    // It would be nicer to just do `createUnionSound(...choices)`,
-    // but typescript complains about it.
-    return choices.length > 0
-      ? createUnionSound(choices[0], ...choices.slice(1))
-      : createNullSound();
+    return choices;
   }
 
   /**
@@ -282,7 +271,7 @@ export class Parser {
 
       // Disallow "#" outside of an environment context in SPE-style rules.
       for (const sound of left) {
-        if (sound.tag === SoundTag.Terminal && sound.value === "#") {
+        if (sound.includes("#")) {
           abort(
             leftToken as Token,
             "unexpected '#' outside a sound environment in an SPE-style rule"
@@ -290,7 +279,7 @@ export class Parser {
         }
       }
       for (const sound of right) {
-        if (sound.tag === SoundTag.Terminal && sound.value === "#") {
+        if (sound.includes("#")) {
           abort(
             rightToken as Token,
             "unexpected '#' outside a sound environment in an SPE-style rule"

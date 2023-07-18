@@ -3,64 +3,13 @@
 // Intermediate representations.
 
 /**
- * Represents a type of sound.
- * Variable isn't a type, because variables can be resolved during parsing.
+ * Represents a sound value.
+ *
+ * - An empty array represents a null sound.
+ * - An array with a single segment represents the sound of that segment.
+ * - An array with multiple elements means "any of these sounds."
  */
-export enum SoundTag {
-  Null,
-  Union,
-
-  // Includes "#" and "_" (means "any", not the location of the sound change)
-  Terminal,
-}
-
-/**
- * Various types of sound values.
- */
-export type NullSound = {
-  tag: SoundTag.Null;
-};
-export type TerminalSound = {
-  tag: SoundTag.Terminal;
-  value: string;
-};
-export type UnionSound = {
-  tag: SoundTag.Union;
-  choices: TerminalSound[];
-};
-
-/**
- * Represents a single sound value.
- */
-export type Sound = NullSound | TerminalSound | UnionSound;
-
-/**
- * Functions for creating sound values.
- */
-export function createNullSound(): NullSound {
-  return {
-    tag: SoundTag.Null,
-  };
-}
-
-export function createTerminalSound(terminal: string): TerminalSound {
-  return {
-    tag: SoundTag.Terminal,
-    value: terminal,
-  };
-}
-
-export function createUnionSound(
-  first: TerminalSound,
-  ...rest: TerminalSound[]
-): UnionSound {
-  // The parameters look a bit weird, because we have to make sure that the
-  // list of choices is non-empty.
-  return {
-    tag: SoundTag.Union,
-    choices: [first, ...rest],
-  };
-}
+export type Sound = string[];
 
 /**
  * Represents an unconstrained rule.

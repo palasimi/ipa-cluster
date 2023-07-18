@@ -3,7 +3,6 @@
 
 // Test parser.ts.
 
-import { createTerminalSound, SoundTag } from "../../src/dsl/ir";
 import { parse, Parser } from "../../src/dsl/parser";
 
 import fc from "fast-check";
@@ -188,8 +187,8 @@ describe("parse", () => {
         },
         rules: [
           {
-            left: [createTerminalSound("m")],
-            right: [createTerminalSound("n")],
+            left: [["m"]],
+            right: [["n"]],
           },
         ],
       },
@@ -204,7 +203,7 @@ describe("Parser", () => {
       for (const example of examples) {
         const parser = new Parser(example);
         const sound = parser.parseSound();
-        assert.equal(sound.tag, SoundTag.Null);
+        assert.deepEqual(sound, []);
       }
     });
   });
