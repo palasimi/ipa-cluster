@@ -8,6 +8,8 @@ import { SquashedIR } from "./squash";
 
 /**
  * A rule without `UnionSound`s.
+ * An `ExpandedRule` indicates that the sequence of IPA segments on the `left`
+ * is equivalent to the sequence on the `right`.
  */
 export type ExpandedRule = {
   constraint: Constraint;
