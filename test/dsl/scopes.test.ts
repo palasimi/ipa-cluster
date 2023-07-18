@@ -4,9 +4,9 @@
 
 import { Scope } from "../../src/dsl/scopes";
 
-import { strict as assert } from "assert";
-
 import fc from "fast-check";
+
+import { strict as assert } from "assert";
 
 /**
  * Returns arbitrary values for testing.

@@ -6,7 +6,17 @@
 import { createTerminalSound, SoundTag } from "../../src/dsl/ir";
 import { parse, Parser } from "../../src/dsl/parser";
 
+import fc from "fast-check";
+
 import { strict as assert } from "assert";
+
+/**
+ * Returns arbitrary language codes for testing.
+ * This function may also return '_'.
+ */
+function languageCode() {
+  return fc.oneof(fc.constant("_"), fc.stringMatching(/^[a-z][a-z-]*[a-z]$/));
+}
 
 describe("parse", () => {
   describe("rules", () => {
@@ -18,6 +28,48 @@ describe("parse", () => {
           ~ b
         `;
         parse(code);
+      });
+    });
+
+    describe("with a language constraint", () => {
+      describe("with no language codes", () => {
+        it("should be an error", () => {
+          assert.throws(() => parse(".~"), {
+            name: "ParseError",
+            message: "expected a language code",
+          });
+        });
+      });
+
+      describe("with one or two language codes", () => {
+        it("should be okay", () => {
+          fc.assert(
+            fc.property(
+              fc.array(languageCode(), { minLength: 1, maxLength: 2 }),
+              (codes) => {
+                const constraint = codes.join(" ");
+                const code = `${constraint}.~`;
+                parse(code);
+              }
+            )
+          );
+        });
+      });
+
+      describe("with more than two language codes", () => {
+        it("should be an error", () => {
+          fc.assert(
+            fc.property(fc.array(languageCode(), { minLength: 3 }), (codes) => {
+              const constraint = codes.join(" ");
+              const code = `${constraint}. a ~ b`;
+
+              assert.throws(() => parse(code), {
+                name: "ParseError",
+                // TODO improve error message
+              });
+            })
+          );
+        });
       });
     });
 

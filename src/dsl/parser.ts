@@ -352,6 +352,40 @@ export class Parser {
   }
 
   /**
+   * Parses language code.
+   * See docstring for `isLanguageCode` for details on what language codes are
+   * supposed to look like.
+   *
+   * Returns an array of language codes.
+   */
+  parseLanguageCodes(): string[] {
+    const codes = [];
+
+    // Stop parsing when we see something that doesn't look like a language
+    // code.
+    for (;;) {
+      const lookahead = this.peek();
+      switch (lookahead?.tag) {
+        case Tag.Underscore:
+          codes.push("_");
+          this.move();
+          break;
+
+        case Tag.Terminal:
+          if (isLanguageCode(lookahead.literal)) {
+            codes.push(lookahead.literal);
+            this.move();
+            continue;
+          }
+          return codes;
+
+        default:
+          return codes;
+      }
+    }
+  }
+
+  /**
    * Parses a language selector/constraint.
    * Returns a pair of language codes.
    *
@@ -364,29 +398,21 @@ export class Parser {
    * This method doesn't do anything to check.
    */
   parseConstraint(): Constraint {
-    // Up to two language codes can be used as a selector.
-    const left = this.expect(Tag.Terminal, "expected a language code");
-    if (!isLanguageCode(left.literal)) {
-      abort(left, "invalid language code");
-    }
-
-    const token = this.move();
-    if (token?.tag === Tag.Dot) {
-      return {
-        left: left.literal,
-        right: left.literal,
-      };
-    }
-
-    const right = this.expect(Tag.Terminal, "expected a language code");
-    if (!isLanguageCode(right.literal)) {
-      abort(right, "invalid language code");
-    }
+    const checkpoint = this.peek();
+    const codes = this.parseLanguageCodes();
 
     this.expect(Tag.Dot, "expected '.'");
+
+    // Check language codes.
+    if (codes.length === 0) {
+      abort(checkpoint, "expected a language code");
+    }
+    if (codes.length > 2) {
+      abort(checkpoint as Token, "too many language codes in constraint");
+    }
     return {
-      left: left.literal,
-      right: right.literal,
+      left: codes[0],
+      right: codes[1] || codes[0],
     };
   }
 
