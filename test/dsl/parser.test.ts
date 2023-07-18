@@ -20,6 +20,31 @@ describe("parse", () => {
         parse(code);
       });
     });
+
+    describe("with a sound environment", () => {
+      describe("without '_'", () => {
+        it("should be an error", () => {
+          assert.throws(() => parse("a ~ b / c"), {
+            name: "ParseError",
+            message: /expected '_'/,
+          });
+
+          assert.throws(() => parse("a ~ b / c d"), {
+            name: "ParseError",
+            message: /expected '_'/,
+          });
+        });
+      });
+
+      describe("with too many '_'s", () => {
+        it("should be an error", () => {
+          assert.throws(() => parse("a ~ b / c _ d _"), {
+            name: "ParseError",
+            // TODO test message
+          });
+        });
+      });
+    });
   });
 
   describe("variable assignments", () => {
