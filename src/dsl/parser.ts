@@ -9,7 +9,6 @@ import {
   Rule,
   Ruleset,
   Sound,
-  SoundEnvironment,
   SoundTag,
   TerminalSound,
   UnionSound,
@@ -30,6 +29,17 @@ export class ParseError extends Error {
     this.name = this.constructor.name;
   }
 }
+
+/**
+ * Represents a sound environment in a rule.
+ */
+export type SoundEnvironment = {
+  left: Sound[];
+  right: Sound[];
+
+  // Whether or not the environment was defined explicitly.
+  explicit: boolean;
+};
 
 /**
  * Code parser.
@@ -288,7 +298,13 @@ export class Parser {
         }
       }
     }
-    return { left, right, environment };
+
+    // Include sound environment information in `left` and `right`.
+    // Effectively, this converts SPE-style rules into string rewriting rules.
+    return {
+      left: [...environment.left, ...left, ...environment.right],
+      right: [...environment.left, ...right, ...environment.right],
+    };
   }
 
   /**

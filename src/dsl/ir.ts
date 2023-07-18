@@ -63,17 +63,6 @@ export function createUnionSound(
 }
 
 /**
- * Represents a sound environment in a rule.
- */
-export type SoundEnvironment = {
-  left: Sound[];
-  right: Sound[];
-
-  // Whether or not the environment was defined explicitly.
-  explicit: boolean;
-};
-
-/**
  * Represents an unconstrained rule.
  */
 export type Rule = {
@@ -82,8 +71,6 @@ export type Rule = {
 
   // Right-hand side of a rule (right of "~")
   right: Sound[];
-
-  environment: SoundEnvironment;
 };
 
 /**
