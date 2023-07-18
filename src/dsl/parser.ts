@@ -193,11 +193,10 @@ export class Parser {
   }
 
   /**
-   * Parses one side of a rule.
-   * Each side of a rule should contain a sequence of one or more `Sound`s.
+   * Parses a sequence of sounds.
    * Returns an array of `Sound`s.
    */
-  parseSide(): Sound[] {
+  parseSounds(): Sound[] {
     const sounds = [];
     for (;;) {
       const lookahead = this.peek();
@@ -208,9 +207,6 @@ export class Parser {
           sounds.push(this.parseSound());
           break;
         default:
-          if (sounds.length === 0) {
-            abort(lookahead, "expected a sound value");
-          }
           return sounds;
       }
     }
@@ -262,6 +258,7 @@ export class Parser {
 
     this.expect(Tag.Slash, "expected '/'");
 
+    // TODO can the target be surrounded by multiple sounds?
     const left = this.parseLeftEnvironment();
 
     const underscore = this.expect(Tag.Terminal, "expected '_'");
@@ -281,11 +278,11 @@ export class Parser {
    */
   parseSimpleRule(): Rule {
     const leftToken = this.peek();
-    const left = this.parseSide();
+    const left = this.parseSounds();
     this.expect(Tag.Tilde, "expected '~'");
 
     const rightToken = this.peek();
-    const right = this.parseSide();
+    const right = this.parseSounds();
     const environment = this.parseEnvironment();
 
     // Perform some checks.

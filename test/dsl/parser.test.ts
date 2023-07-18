@@ -9,7 +9,20 @@ import { parse, Parser } from "../../src/dsl/parser";
 import { strict as assert } from "assert";
 
 describe("parse", () => {
-  describe("with variable assignments", () => {
+  describe("rules", () => {
+    describe("with empty side", () => {
+      it("should be okay", () => {
+        const code = `
+          ~
+          a ~
+          ~ b
+        `;
+        parse(code);
+      });
+    });
+  });
+
+  describe("variable assignments", () => {
     describe("with redefined variable", () => {
       it("should be an error", () => {
         const code = `
