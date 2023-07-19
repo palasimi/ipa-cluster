@@ -53,16 +53,16 @@ export class ContextMatcher {
    * Tests if `s[i]` and `t[j]` match any of the stored contexts.
    *
    * @param s - An array of IPA segments
-   * @param i - Index to an element in `s`
    * @param t - An array of IPA segments
+   * @param i - Index to an element in `s`
    * @param j - Index to an element in `t`
    * @param l1 - Language of `s`
    * @param l2 - Language of `t`
    */
   test(
     s: string[],
-    i: number,
     t: string[],
+    i: number,
     j: number,
     l1: string,
     l2: string

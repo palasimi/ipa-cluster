@@ -30,22 +30,22 @@ export class Querier {
    * Checks if the query satisfies a defined rule.
    *
    * @param s - An array of IPA segments
-   * @param i - Index to an element in `s`
    * @param t - An array of IPA segments
+   * @param i - Index to an element in `s`
    * @param j - Index to an element in `t`
    * @param l1 - Language of `s`
    * @param l2 - Language of `t`
    */
   query(
     s: string[],
-    i: number,
     t: string[],
+    i: number,
     j: number,
     l1: string,
     l2: string
   ): boolean {
     // TODO handle negative indices
-    let a = s[i] || "#";
+    let a = s[i] || "#"; // TODO shouldn't this be ""?
     let b = t[j] || "#";
 
     if (a === b) {
@@ -64,7 +64,7 @@ export class Querier {
     if (matcher == null) {
       return false;
     }
-    return matcher.test(s, i, t, j, l1, l2);
+    return matcher.test(s, t, i, j, l1, l2);
   }
 }
 
