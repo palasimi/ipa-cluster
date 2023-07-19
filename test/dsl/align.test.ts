@@ -12,6 +12,22 @@ import fc from "fast-check";
 import { strict as assert } from "assert";
 
 describe("align", () => {
+  describe("with empty sequence", () => {
+    it("should turn the shorter sequence into a sequence of '_'s", () => {
+      const code = "a b c ~ {}";
+      const ir = align(expand(squash(parse(code))));
+      assert.deepEqual(ir, {
+        rules: [
+          {
+            constraint: { left: "_", right: "_" },
+            left: ["a", "b", "c"],
+            right: ["_", "_", "_"],
+          },
+        ],
+      });
+    });
+  });
+
   describe("sequences of the same length", () => {
     it("should return the input unmodified", () => {
       fc.assert(
