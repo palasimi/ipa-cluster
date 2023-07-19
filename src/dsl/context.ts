@@ -83,20 +83,12 @@ export class ContextMatcher {
       [l1, l2] = [l2, l1];
     }
 
-    // TODO test left-before, left-after, right-before and right-after contexts
     // TODO handle negative indices (see CustomCostFunction) params.
-    if (!this.leftAfterMachine.test(s.slice(i + 1), l1)) {
-      return false;
-    }
-    if (!this.rightAfterMachine.test(t.slice(j + 1), l2)) {
-      return false;
-    }
-    if (!this.leftBeforeMachine.test(s.slice(0, i).reverse(), l1)) {
-      return false;
-    }
-    if (!this.rightBeforeMachine.test(t.slice(0, j).reverse(), l2)) {
-      return false;
-    }
-    return true;
+    return (
+      this.leftAfterMachine.test(s.slice(i + 1), l1) &&
+      this.rightAfterMachine.test(t.slice(j + 1), l2) &&
+      this.leftBeforeMachine.test(s.slice(0, i).reverse(), l1) &&
+      this.rightBeforeMachine.test(t.slice(0, j).reverse(), l2)
+    );
   }
 }
