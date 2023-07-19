@@ -7,9 +7,32 @@ import { expand } from "../../src/dsl/expand";
 import { parse } from "../../src/dsl/parser";
 import { squash } from "../../src/dsl/squash";
 
+import fc from "fast-check";
+
 import { strict as assert } from "assert";
 
 describe("align", () => {
+  describe("sequences of the same length", () => {
+    it("should return the input unmodified", () => {
+      fc.assert(
+        fc.property(fc.array(fc.string()), (sequence) => {
+          const constraint = { left: "_", right: "_" };
+          const ir = {
+            rules: [
+              {
+                constraint,
+                left: sequence,
+                right: sequence,
+              },
+            ],
+          };
+          const result = align(ir);
+          assert.deepEqual(ir, result);
+        })
+      );
+    });
+  });
+
   describe("when aligning beyond '#'", () => {
     it("should pad shorter sequence with '#'s", () => {
       const code = "a b # ~ a #";
