@@ -13,7 +13,7 @@ export type Context = SplitRule;
 /**
  * Context matcher.
  */
-class ContextMatcher {
+export class ContextMatcher {
   // We don't use `TrieMap`s for matching, because those are used to find words
   // in the trie that match the given prefix.
   // Instead, we want to find the prefixes stored in a data structure that
