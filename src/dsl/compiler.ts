@@ -25,6 +25,47 @@ export class Querier {
     const matcher = this.map.get(key) as ContextMatcher;
     matcher.add(rule);
   }
+
+  /**
+   * Checks if the query satisfies a defined rule.
+   *
+   * @param s - An array of IPA segments
+   * @param i - Index to an element in `s`
+   * @param t - An array of IPA segments
+   * @param j - Index to an element in `t`
+   * @param l1 - Language of `s`
+   * @param l2 - Language of `t`
+   */
+  query(
+    s: string[],
+    i: number,
+    t: string[],
+    j: number,
+    l1: string,
+    l2: string
+  ): boolean {
+    // TODO handle negative indices
+    let a = s[i] || "#";
+    let b = t[j] || "#";
+
+    if (a === b) {
+      return true;
+    }
+
+    if (b < a) {
+      [s, t] = [t, s];
+      [i, j] = [j, i];
+      [a, b] = [b, a];
+      [l1, l2] = [l2, l1];
+    }
+
+    const key = `${a}~${b}`;
+    const matcher = this.map.get(key);
+    if (matcher == null) {
+      return false;
+    }
+    return matcher.test(s, i, t, j, l1, l2);
+  }
 }
 
 /**
