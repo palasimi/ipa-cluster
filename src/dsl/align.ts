@@ -13,8 +13,8 @@ type Alignment = [SequenceSound, SequenceSound];
  * longer string.
  */
 function findOptimalShift(left: SequenceSound, right: SequenceSound): number {
-  const short = left.length < right.length ? left : right;
-  const long = left.length < right.length ? right : left;
+  const short = left.length <= right.length ? left : right;
+  const long = left.length <= right.length ? right : left;
 
   const m = long.length;
   const n = short.length;
@@ -26,7 +26,7 @@ function findOptimalShift(left: SequenceSound, right: SequenceSound): number {
   // Find alignment with best score.
   let maxScore = 0;
   let bestStart = 0;
-  for (let start = 0; start < m - n; start++) {
+  for (let start = 0; start <= m - n; start++) {
     let score = 0;
     for (let i = 0; i < n; i++) {
       if (short[i] === long[start + i]) {

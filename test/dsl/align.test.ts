@@ -10,6 +10,37 @@ import { squash } from "../../src/dsl/squash";
 import { strict as assert } from "assert";
 
 describe("align", () => {
+  describe("when both sides of a rule share some segments", () => {
+    it("should add left padding to optimize alignment", () => {
+      const code = `
+        a b c ~ a
+        a b c ~ b
+        a b c ~ c
+      `;
+      const ir = align(expand(squash(parse(code))));
+      const constraint = { left: "_", right: "_" };
+      assert.deepEqual(ir, {
+        rules: [
+          {
+            constraint,
+            left: ["a", "b", "c"],
+            right: ["a", "_", "_"],
+          },
+          {
+            constraint,
+            left: ["a", "b", "c"],
+            right: ["_", "b", "_"],
+          },
+          {
+            constraint,
+            left: ["a", "b", "c"],
+            right: ["_", "_", "c"],
+          },
+        ],
+      });
+    });
+  });
+
   it("should add padding so both sides of a rule have the same length", () => {
     const code = `
       a ~ {}
