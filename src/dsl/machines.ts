@@ -75,6 +75,9 @@ export class AcyclicMachine {
       if (this.accepts(state, language)) {
         return true;
       }
+      if (!state.transitions.has(segment)) {
+        return false;
+      }
     }
     const state = this.states.get(segments.length);
     if (state == null) {
