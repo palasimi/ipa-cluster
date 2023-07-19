@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2023 Levi Gruspe
 
-import {
-  CostFunction,
-  CostFunctionOptions,
-  Sequence,
-} from "./ipa-cluster/metrics";
+import { CostFunction, CostFunctionOptions } from "./ipa-cluster/metrics";
 
 import { parse, toQuerier } from "./sound-change-parser/index";
 
@@ -13,13 +9,13 @@ import { parse, toQuerier } from "./sound-change-parser/index";
 // The sound changes in `code` are exempted from penalties when computing edit
 // distances.
 // May raise `ParseError`.
-export function createCostFunction(code: string): CostFunction<string> {
+export function createCostFunction(code: string): CostFunction<string[]> {
   const tree = parse(code);
   const hasRule = toQuerier(tree);
 
   return function customCost(
-    s: Sequence<string>,
-    t: Sequence<string>,
+    s: string[],
+    t: string[],
     i: number,
     j: number,
     options: CostFunctionOptions = {}

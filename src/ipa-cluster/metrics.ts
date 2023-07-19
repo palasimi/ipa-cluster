@@ -3,8 +3,8 @@
 
 // String metric/distance functions.
 
-export interface Sequence<T> {
-  [key: number]: T;
+export interface Sequence {
+  [key: number]: unknown;
   length: number;
 }
 
@@ -21,17 +21,17 @@ export type CostFunctionOptions = {
 // If the index is negative, `-index - 1` gives the current position in the
 // corresponding string.
 export type CostFunction<T> = (
-  s: Sequence<T>,
-  t: Sequence<T>,
+  s: T,
+  t: T,
   i: number,
   j: number,
   options?: CostFunctionOptions
 ) => number;
 
 // Default cost function for the Levenshtein distance.
-function defaultCost<T>(
-  s: Sequence<T>,
-  t: Sequence<T>,
+function defaultCost<T extends Sequence>(
+  s: T,
+  t: T,
   i: number,
   j: number
 ): number {
@@ -49,9 +49,9 @@ function defaultCost<T>(
 // Compute the weighted Levenshtein distance between two sequences.
 // The options argument is passed to the cost function.
 // It can be used to pass additional data to the cost function.
-export function levenshtein<T>(
-  s: Sequence<T>,
-  t: Sequence<T>,
+export function levenshtein<T extends Sequence>(
+  s: T,
+  t: T,
   cost: CostFunction<T> = defaultCost,
   options: CostFunctionOptions = {}
 ): number {
