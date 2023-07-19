@@ -27,7 +27,22 @@ describe("parse", () => {
       const irA = parse(codeA);
       const irB = parse(codeB);
       assert.deepEqual(irA, irB);
-      // TODO spell out the IR
+      assert.deepEqual(irA, {
+        rulesets: [
+          {
+            constraint: {
+              left: "_",
+              right: "_",
+            },
+            rules: [
+              {
+                left: [["c"], ["a"], ["d"]],
+                right: [["c"], ["b"], ["d"]],
+              },
+            ],
+          },
+        ],
+      });
     });
   });
 
@@ -116,7 +131,7 @@ describe("parse", () => {
         it("should be an error", () => {
           assert.throws(() => parse("a ~ b / c _ d _"), {
             name: "ParseError",
-            // TODO test message
+            // TODO improve error message
           });
         });
       });
@@ -199,6 +214,22 @@ describe("parse", () => {
       const irA = parse(codeA);
       const irB = parse(codeB);
       assert.deepEqual(irA, irB);
+      assert.deepEqual(irA, {
+        rulesets: [
+          {
+            constraint: {
+              left: "_",
+              right: "_",
+            },
+            rules: [
+              {
+                left: [["b", "d", "g"], ["#"]],
+                right: [["p", "t", "k"], ["#"]],
+              },
+            ],
+          },
+        ],
+      });
     });
   });
 
