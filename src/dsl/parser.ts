@@ -144,9 +144,6 @@ export class Parser {
     const lhs = this.expect(Tag.Variable, "expected a variable name");
     this.expect(Tag.Equals, "expected '='");
     const rhs = this.parseSound();
-
-    // TODO test what happens if there are more than one symbol on the right
-    // TODO this already allows "#" in the rhs, but add some tests to be sure
     const ok = this.scope.define(lhs.literal, rhs);
     if (!ok) {
       abort(lhs, `cannot redefine the variable '${lhs.literal}'`);

@@ -27,6 +27,7 @@ describe("parse", () => {
       const irA = parse(codeA);
       const irB = parse(codeB);
       assert.deepEqual(irA, irB);
+      // TODO spell out the IR
     });
   });
 
@@ -156,6 +157,35 @@ describe("parse", () => {
       assert.deepEqual(parse("A = { a e i o u }").rulesets, []);
     });
 
+    it("should allow '#' on the right-hand side", () => {
+      const codeA = `
+        A = #
+        b~p/_A
+      `;
+      const codeB = "b~p/_#";
+
+      // The examples above should produce the same intermediate representation.
+      const irA = parse(codeA);
+      const irB = parse(codeB);
+      assert.deepEqual(irA, irB);
+      assert.deepEqual(irA, {
+        rulesets: [
+          {
+            constraint: {
+              left: "_",
+              right: "_",
+            },
+            rules: [
+              {
+                left: [["b"], ["#"]],
+                right: [["p"], ["#"]],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
     it("should resolve variable names during parsing", () => {
       const codeA = `
         A={b d g}
@@ -197,6 +227,40 @@ describe("parse", () => {
 });
 
 describe("Parser", () => {
+  describe("parseAssignment", () => {
+    describe("with no symbols on the right", () => {
+      it("should be an error", () => {
+        const code = "A=";
+        const parser = new Parser(code);
+        assert.throws(() => parser.parseAssignment(), {
+          name: "ParseError",
+          message: /expected a sound value/,
+        });
+      });
+    });
+
+    describe("with a symbol on the right", () => {
+      it("should be okay", () => {
+        const code = "A=a";
+        const parser = new Parser(code);
+        parser.parseAssignment();
+      });
+    });
+
+    describe("with multiple symbols on the right", () => {
+      it("should be an error", () => {
+        // We're actually testing `parse` instead of `parseAssignment`,
+        // but we'll put it here so all assignment-related tests are in the
+        // same place.
+        const code = "A=a b";
+        assert.throws(() => parse(code), {
+          name: "ParseError",
+          // TODO improve error message
+        });
+      });
+    });
+  });
+
   describe("parseSound", () => {
     it("should be able to parse null", () => {
       const examples = ["{}", " { } "];
