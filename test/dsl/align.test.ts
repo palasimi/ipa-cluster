@@ -10,6 +10,23 @@ import { squash } from "../../src/dsl/squash";
 import { strict as assert } from "assert";
 
 describe("align", () => {
+  describe("when aligning beyond '#'", () => {
+    it("should pad shorter sequence with '#'s", () => {
+      const code = "a b # ~ a #";
+      const ir = align(expand(squash(parse(code))));
+      const constraint = { left: "_", right: "_" };
+      assert.deepEqual(ir, {
+        rules: [
+          {
+            constraint,
+            left: ["a", "b", "#"],
+            right: ["a", "#", "#"],
+          },
+        ],
+      });
+    });
+  });
+
   describe("when both sides of a rule share some segments", () => {
     it("should add left padding to optimize alignment", () => {
       const code = `
