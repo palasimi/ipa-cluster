@@ -16,6 +16,7 @@ export class Querier {
    * Adds a rule.
    */
   add(rule: Context) {
+    // `left <= right` after splitting, so we don't have to check again.
     const { left, right } = rule;
     const key = `${left}~${right}`;
 
@@ -44,9 +45,11 @@ export class Querier {
     l1: string,
     l2: string
   ): boolean {
-    // TODO handle negative indices
-    let a = s[i] || "#"; // TODO shouldn't this be ""?
-    let b = t[j] || "#";
+    // Construct map key.
+    // "_" stands for "delete the opposite segment."
+    let a = s[i] || "_";
+    let b = t[j] || "_";
+    // TODO use "#" instead of "_" for word boundaries?
 
     if (a === b) {
       return true;

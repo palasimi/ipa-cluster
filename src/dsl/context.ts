@@ -67,9 +67,9 @@ export class ContextMatcher {
     l1: string,
     l2: string
   ): boolean {
-    // TODO what if `s[i]` or `t[j]` is "" and is not out of bounds?
-    let a = s[i] || "#";
-    let b = t[j] || "#";
+    let a = s[i] || "_";
+    let b = t[j] || "_";
+    // TODO "#" instead of "_" for word boundaries?
 
     // There's no need to match the context if the symbols are the same.
     if (a === b) {

@@ -45,6 +45,8 @@ function findOptimalShift(left: SequenceSound, right: SequenceSound): number {
 /**
  * Pads left and right sequences with "_" or "#" so that the sequences are
  * aligned.
+ * "_" means "delete the corresponding character".
+ * "#" represents a word boundary.
  */
 function pad(left: SequenceSound, right: SequenceSound): Alignment {
   const leftCopy = left.slice();
@@ -68,7 +70,9 @@ function pad(left: SequenceSound, right: SequenceSound): Alignment {
 
 /**
  * Like an `ExpandedIR`, but sequences on each side of a rule are guaranteed to
- * be aligned (same size and padded by "_").
+ * be aligned (same size and padded by "_" or "#").
+ * "_" means "delete the corresponding character".
+ * "#" represents a word boundary.
  */
 export type AlignedIR = ExpandedIR;
 
