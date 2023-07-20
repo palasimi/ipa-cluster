@@ -47,19 +47,29 @@ export class AcyclicMachine {
    * @param language - Language of query needed to match ("_" for "don't care")
    */
   add(segments: string[], language = "_") {
-    for (const [i, segment] of segments.entries()) {
+    let i = 0;
+    for (const segment of segments) {
+      // Ignore "_".
+      // These represent deleted segments (i.e. null sounds).
+      if (segment === "_") {
+        continue;
+      }
+
       if (!this.states.has(i)) {
         this.states.set(i, createStateAttributes());
       }
       const attributes = this.states.get(i) as StateAttributes;
       attributes.transitions.add(segment);
+
+      // Next state.
+      i++;
     }
 
-    const goal = segments.length;
-    if (!this.states.has(goal)) {
-      this.states.set(goal, createStateAttributes());
+    // Set goal state.
+    if (!this.states.has(i)) {
+      this.states.set(i, createStateAttributes());
     }
-    (this.states.get(goal) as StateAttributes).languages.add(language);
+    (this.states.get(i) as StateAttributes).languages.add(language);
   }
 
   /**
