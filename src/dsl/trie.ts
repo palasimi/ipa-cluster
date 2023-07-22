@@ -73,8 +73,14 @@ export class Trie {
    */
   test(input: string[], language = "_"): boolean {
     // TODO handle "#"
-    // TODO test every sequence is accepted after trie.add([])
     let node = this.root;
+
+    // Early return if already at an accept state.
+    // Normal tries don't do this.
+    if (node.accepts(language)) {
+      return true;
+    }
+
     for (const symbol of input) {
       const child = node.children.get(symbol);
       if (child == null) {
@@ -82,7 +88,7 @@ export class Trie {
       }
       node = child;
 
-      // Early return if already an accept state.
+      // Early return if already at an accept state.
       // Normal tries don't do this.
       if (node.accepts(language)) {
         return true;
