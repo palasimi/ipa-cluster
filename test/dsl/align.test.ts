@@ -12,6 +12,31 @@ import fc from "fast-check";
 import { strict as assert } from "assert";
 
 describe("align", () => {
+  it("with '#'", () => {
+    const code = `
+      a b # ~ a #
+      a b ~ a #
+    `;
+    const ir = align(expand(squash(parse(code))));
+    const constraint = { left: "_", right: "_" };
+    assert.deepEqual(ir, {
+      rules: [
+        {
+          // Line 1
+          constraint,
+          left: ["a", "b", "#"],
+          right: ["a", "_", "#"],
+        },
+        {
+          // Line 2
+          constraint,
+          left: ["a", "b", "_"],
+          right: ["a", "_", "#"],
+        },
+      ],
+    });
+  });
+
   describe("with empty sequence", () => {
     it("should turn the shorter sequence into a sequence of '_'s", () => {
       const code = "a b c ~ {}";
@@ -46,23 +71,6 @@ describe("align", () => {
           assert.deepEqual(ir, result);
         })
       );
-    });
-  });
-
-  describe("when aligning beyond '#'", () => {
-    it("should pad shorter sequence with '#'s", () => {
-      const code = "a b # ~ a #";
-      const ir = align(expand(squash(parse(code))));
-      const constraint = { left: "_", right: "_" };
-      assert.deepEqual(ir, {
-        rules: [
-          {
-            constraint,
-            left: ["a", "b", "#"],
-            right: ["a", "#", "#"],
-          },
-        ],
-      });
     });
   });
 
