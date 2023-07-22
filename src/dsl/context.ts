@@ -2,8 +2,8 @@
 // Copyright (c) 2023 Levi Gruspe
 // Context-matching.
 
-import { AcyclicMachine } from "./machines";
 import { SplitRule } from "./split";
+import { Trie } from "./trie";
 
 /**
  * Queries should match some `Context` stored in a `ContextMatcher`.
@@ -14,15 +14,10 @@ export type Context = SplitRule;
  * Context matcher.
  */
 export class ContextMatcher {
-  // We don't use `TrieMap`s for matching, because those are used to find words
-  // in the trie that match the given prefix.
-  // Instead, we want to find the prefixes stored in a data structure that
-  // match the given word.
-  // See the Wiki page for "Deterministic acyclic finite state automaton."
-  private leftBeforeMachine: AcyclicMachine = new AcyclicMachine();
-  private leftAfterMachine: AcyclicMachine = new AcyclicMachine();
-  private rightBeforeMachine: AcyclicMachine = new AcyclicMachine();
-  private rightAfterMachine: AcyclicMachine = new AcyclicMachine();
+  private leftBeforeTrie: Trie = new Trie();
+  private leftAfterTrie: Trie = new Trie();
+  private rightBeforeTrie: Trie = new Trie();
+  private rightAfterTrie: Trie = new Trie();
 
   /**
    * Adds a context to the `ContextMatcher`.
@@ -43,10 +38,10 @@ export class ContextMatcher {
       rightBeforeContext,
       rightAfterContext,
     } = context;
-    this.leftBeforeMachine.add(leftBeforeContext, constraint.left);
-    this.leftAfterMachine.add(leftAfterContext, constraint.left);
-    this.rightBeforeMachine.add(rightBeforeContext, constraint.right);
-    this.rightAfterMachine.add(rightAfterContext, constraint.right);
+    this.leftBeforeTrie.add(leftBeforeContext, constraint.left);
+    this.leftAfterTrie.add(leftAfterContext, constraint.left);
+    this.rightBeforeTrie.add(rightBeforeContext, constraint.right);
+    this.rightAfterTrie.add(rightAfterContext, constraint.right);
   }
 
   /**
@@ -85,10 +80,10 @@ export class ContextMatcher {
 
     // TODO handle negative indices (see CustomCostFunction) params.
     return (
-      this.leftAfterMachine.test(s.slice(i + 1), l1) &&
-      this.rightAfterMachine.test(t.slice(j + 1), l2) &&
-      this.leftBeforeMachine.test(s.slice(0, i).reverse(), l1) &&
-      this.rightBeforeMachine.test(t.slice(0, j).reverse(), l2)
+      this.leftAfterTrie.test(s.slice(i + 1), l1) &&
+      this.rightAfterTrie.test(t.slice(j + 1), l2) &&
+      this.leftBeforeTrie.test(s.slice(0, i).reverse(), l1) &&
+      this.rightBeforeTrie.test(t.slice(0, j).reverse(), l2)
     );
   }
 }
