@@ -15,7 +15,20 @@ class TrieNode {
   children: Map<string, TrieNode> = new Map();
 
   // Languages for which the node is an accept state.
-  accepts: Set<Language> = new Set();
+  acceptedLanguages: Set<Language> = new Set();
+
+  /**
+   * Checks if the state is an accept state for the given language.
+   * If `language` is "_", returns true if the state is an accept state for any
+   * language.
+   */
+  accepts(language = "_"): boolean {
+    const languages = this.acceptedLanguages;
+    if (language === "_") {
+      return languages.size > 0;
+    }
+    return languages.has("_") || languages.has(language);
+  }
 }
 
 /**
@@ -50,7 +63,7 @@ export class Trie {
     }
 
     // Set accept state.
-    node.accepts.add(language);
+    node.acceptedLanguages.add(language);
   }
 
   /**
@@ -71,10 +84,10 @@ export class Trie {
 
       // Early return if already an accept state.
       // Normal tries don't do this.
-      if (node.accepts.has(language)) {
+      if (node.accepts(language)) {
         return true;
       }
     }
-    return node.accepts.has(language);
+    return node.accepts(language);
   }
 }
