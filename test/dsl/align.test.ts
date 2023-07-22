@@ -16,6 +16,10 @@ describe("align", () => {
     const code = `
       a b # ~ a #
       a b ~ a #
+      # a ~ a
+      a b c ~ # b #
+      # a b c ~ # c
+      a # ~ a b c
     `;
     const ir = align(expand(squash(parse(code))));
     const constraint = { left: "_", right: "_" };
@@ -32,6 +36,30 @@ describe("align", () => {
           constraint,
           left: ["a", "b", "_"],
           right: ["a", "_", "#"],
+        },
+        {
+          // Line 3
+          constraint,
+          left: ["#", "a"],
+          right: ["_", "a"],
+        },
+        {
+          // Line 4
+          constraint,
+          left: ["_", "a", "b", "c", "_"],
+          right: ["#", "_", "b", "_", "#"],
+        },
+        {
+          // Line 5
+          constraint,
+          left: ["#", "a", "b", "c"],
+          right: ["#", "_", "_", "c"],
+        },
+        {
+          // Line 6
+          constraint,
+          left: ["a", "_", "_", "#"],
+          right: ["a", "b", "c", "_"],
         },
       ],
     });
