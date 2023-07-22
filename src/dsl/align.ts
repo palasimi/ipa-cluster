@@ -87,12 +87,12 @@ function findLastIndex<T>(array: T[], callback: (value: T) => boolean): number {
  * Removes word boundaries from the sequence.
  * Returns a triple.
  * First element: the trimmed sequence.
- * Second element: number of removed "#"s from the left.
- * Third element: number of removed "#"s from the right.
+ * Second element: does the sequence begin with "#"?
+ * Third element: does the sequence end with "#"?
  */
 function trimBoundaries(
   sequence: SequenceSound
-): [SequenceSound, number, number] {
+): [SequenceSound, boolean, boolean] {
   const start = sequence.findIndex((sound) => sound !== "#");
 
   let end = findLastIndex(sequence, (sound) => sound !== "#") + 1;
@@ -101,44 +101,32 @@ function trimBoundaries(
   }
 
   const trimmed = sequence.slice(start, end);
-  return [trimmed, start, sequence.length - end];
+  return [trimmed, start > 0, end < sequence.length];
 }
 
 /**
  * Reattaches trimmed word boundaries to two sequences, while keeping them
  * aligned.
+ * `left` and `right` should be of the same length.
  */
 function bound(
   left: SequenceSound,
-  prefixLeft: number,
-  suffixLeft: number,
+  hasPrefixLeft: boolean,
+  hasSuffixLeft: boolean,
   right: SequenceSound,
-  prefixRight: number,
-  suffixRight: number
+  hasPrefixRight: boolean,
+  hasSuffixRight: boolean
 ): Alignment {
   const newLeft = [];
   const newRight = [];
 
   // Add trimmed prefixes.
-  if (prefixLeft > 0) {
+  if (hasPrefixLeft) {
     newLeft.push("#");
-    for (let i = 1; i < prefixLeft; i++) {
-      newLeft.push("_");
-    }
-  }
-  if (prefixRight > 0) {
-    newRight.push("#");
-    for (let i = 1; i < prefixRight; i++) {
-      newRight.push("_");
-    }
-  }
-
-  // Add more padding if the prefixes are not the same length.
-  while (newLeft.length < newRight.length) {
+    newRight.push(hasPrefixRight ? "#" : "_");
+  } else if (hasPrefixRight) {
     newLeft.push("_");
-  }
-  while (newRight.length < newLeft.length) {
-    newRight.push("_");
+    newRight.push("#");
   }
 
   // Add sequences.
@@ -150,26 +138,13 @@ function bound(
   }
 
   // Add trimmed suffixes.
-  for (let i = 1; i < suffixLeft; i++) {
-    newLeft.push("_");
-  }
-  for (let i = 1; i < suffixRight; i++) {
-    newRight.push("_");
-  }
-  while (newLeft.length < newRight.length) {
-    newLeft.push("_");
-  }
-  while (newRight.length < newLeft.length) {
-    newRight.push("_");
-  }
-  if (suffixLeft > 0) {
+  if (hasSuffixLeft) {
     newLeft.push("#");
-    newRight.push(suffixRight > 0 ? "#" : "_");
-  } else if (suffixRight > 0) {
+    newRight.push(hasSuffixRight ? "#" : "_");
+  } else if (hasSuffixRight) {
     newLeft.push("_");
     newRight.push("#");
   }
-
   return [newLeft, newRight];
 }
 
@@ -181,8 +156,8 @@ function bound(
  */
 function pad(left: SequenceSound, right: SequenceSound): Alignment {
   // Switch args so that `left.length <= right.length`.
-  const [trimmedLeft, prefixLeft, suffixLeft] = trimBoundaries(left);
-  const [trimmedRight, prefixRight, suffixRight] = trimBoundaries(right);
+  const [trimmedLeft, hasPrefixLeft, hasSuffixLeft] = trimBoundaries(left);
+  const [trimmedRight, hasPrefixRight, hasSuffixRight] = trimBoundaries(right);
 
   let reversed = false;
   let [short, long] = [trimmedLeft, trimmedRight];
@@ -199,11 +174,11 @@ function pad(left: SequenceSound, right: SequenceSound): Alignment {
   const [paddedLeft, paddedRight] = [paddedShort, paddedLong];
   return bound(
     paddedLeft,
-    prefixLeft,
-    suffixLeft,
+    hasPrefixLeft,
+    hasSuffixLeft,
     paddedRight,
-    prefixRight,
-    suffixRight
+    hasPrefixRight,
+    hasSuffixRight
   );
 }
 
