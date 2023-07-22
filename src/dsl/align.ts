@@ -5,29 +5,20 @@
 import { ExpandedIR } from "./expand";
 import { SequenceSound } from "./operators";
 
-type Alignment = [SequenceSound, SequenceSound];
-
 /**
- * Exception thrown by functions in this module when an assertion fails
- * This exception should never reach library users.
+ * A pair of sound sequences of the same length.
+ * TODO enforce at compile time
  */
-class AssertionError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
+type Alignment = [SequenceSound, SequenceSound];
 
 /**
  * Find the number of times that the shorter string should be "shifted" to the
  * right to maximize the number of alignments (matching symbols) with the
  * longer string.
+ *
+ * The first argument should not be longer than the second argument.
  */
 function findOptimalShift(short: SequenceSound, long: SequenceSound): number {
-  if (long.length < short.length) {
-    throw new AssertionError("expected short.length <= long.length");
-  }
-
   const m = long.length;
   const n = short.length;
 
@@ -58,6 +49,8 @@ function findOptimalShift(short: SequenceSound, long: SequenceSound): number {
  * Pads the shorter sequence with null sounds ("_") so that the sequences have
  * the same length.
  * Both sequences should not contain "#".
+ *
+ * The first argument should not be longer than the second argument.
  */
 function padNull(short: SequenceSound, long: SequenceSound): Alignment {
   const shift = findOptimalShift(short, long);
@@ -132,10 +125,6 @@ function bound(
   // Add sequences.
   newLeft.push(...left);
   newRight.push(...right);
-
-  if (newLeft.length !== newRight.length) {
-    throw new AssertionError("expected the sequences to be the same length");
-  }
 
   // Add trimmed suffixes.
   if (hasSuffixLeft) {
