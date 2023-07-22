@@ -73,7 +73,7 @@ export class Trie {
    */
   test(input: string[], language = "_"): boolean {
     // TODO handle "#"
-    // TODO test empty sequence is accepted after trie.add([])
+    // TODO test every sequence is accepted after trie.add([])
     let node = this.root;
     for (const symbol of input) {
       const child = node.children.get(symbol);
