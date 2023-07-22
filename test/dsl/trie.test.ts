@@ -44,6 +44,46 @@ describe("Trie", () => {
     );
   });
 
+  it("should only accept sequences that have been added", () => {
+    const exclude = /_| /;
+
+    fc.assert(
+      fc.property(
+        fc.uniqueArray(
+          fc
+            .array(fc.string().filter((s) => s.length > 0 && !exclude.test(s)))
+            .map((a) => a.join(" "))
+        ),
+        (examples) => {
+          // Testing strategy: we'll only add sequences at even indices.
+          const even = [];
+          const odd = [];
+          for (const [i, example] of examples.entries()) {
+            if (i % 2 === 0) {
+              even.push(example.split(" "));
+            } else {
+              odd.push(example.split(" "));
+            }
+          }
+
+          const trie = new Trie();
+          for (const example of even) {
+            trie.add(example);
+          }
+
+          // Even examples should be accepted, while odd examples (those that
+          // weren't added) should be rejected.
+          for (const example of even) {
+            assert.ok(trie.test(example));
+          }
+          for (const example of odd) {
+            assert.ok(!trie.test(example));
+          }
+        }
+      )
+    );
+  });
+
   it("should not contain '_' transitions in added sequences", () => {
     const trie = new Trie();
 
