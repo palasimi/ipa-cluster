@@ -49,7 +49,6 @@ export class Querier {
     // "_" stands for "delete the opposite segment."
     let a = s[i] || "_";
     let b = t[j] || "_";
-    // TODO use "#" instead of "_" for word boundaries?
 
     if (a === b) {
       return true;

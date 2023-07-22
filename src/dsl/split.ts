@@ -54,6 +54,18 @@ export function split(ir: AlignedIR): SplitIR {
       const leftSound = leftSequence[i];
       const rightSound = rightSequence[i];
 
+      // `align` guarantees that "#" is only ever aligned with "#" or "_".
+      // We can ignore such alignments, because they're not useful for
+      // context matching.
+      if (leftSound === "#" || rightSound === "#") {
+        continue;
+      }
+      // We can also ignore alignments where both segments are equal,
+      // because they already form a match regardless of their context.
+      if (leftSound === rightSound) {
+        continue;
+      }
+
       // Define contexts.
       const leftBeforeContext = leftSequence.slice(0, i).reverse();
       const leftAfterContext = leftSequence.slice(i + 1);

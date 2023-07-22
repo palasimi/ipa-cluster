@@ -23,14 +23,15 @@ export class ContextMatcher {
    * Adds a context to the `ContextMatcher`.
    */
   add(context: Context) {
-    // If `left` and `right` segments are the same, there's no need to match
-    // the context.
+    // There are cases where a context/split rule does not need to be added.
+    // See `split()`.
+    // We'll check again here just to be sure.
+
     const { left, right } = context;
-    if (left === right) {
+    if (left === right || left === "#" || right === "#") {
       return;
     }
 
-    // TODO how to handle "#" and "_"? Throw an error?
     const {
       constraint,
       leftBeforeContext,
@@ -64,7 +65,6 @@ export class ContextMatcher {
   ): boolean {
     let a = s[i] || "_";
     let b = t[j] || "_";
-    // TODO "#" instead of "_" for word boundaries?
 
     // There's no need to match the context if the symbols are the same.
     if (a === b) {
