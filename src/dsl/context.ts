@@ -77,13 +77,42 @@ export class ContextMatcher {
       [a, b] = [b, a];
       [l1, l2] = [l2, l1];
     }
-
-    // TODO handle negative indices (see CustomCostFunction) params.
     return (
-      this.leftAfterTrie.test(s.slice(i + 1), l1) &&
-      this.rightAfterTrie.test(t.slice(j + 1), l2) &&
-      this.leftBeforeTrie.test(s.slice(0, i).reverse(), l1) &&
-      this.rightBeforeTrie.test(t.slice(0, j).reverse(), l2)
+      this.leftAfterTrie.test(extractAfter(s, i), l1) &&
+      this.rightAfterTrie.test(extractAfter(t, j), l2) &&
+      this.leftBeforeTrie.test(extractBefore(s, i), l1) &&
+      this.rightBeforeTrie.test(extractBefore(t, j), l2)
     );
   }
+}
+
+/**
+ * Extracts the strings before the given position.
+ * Negative indices are used to indicate that there's a deleted element near
+ * position `i`.
+ *
+ * The result is reversed so that the first element of the array is the nearest
+ * to `i` and the last element is the furthest.
+ * Also adds "#" at the end of the result (word boundary).
+ */
+function extractBefore(s: string[], i: number): string[] {
+  // TODO should the index be -i-1 or -i when i is negative?
+  const result = i >= 0 ? s.slice(0, i) : s.slice(0, -i - 1);
+  result.reverse();
+  result.push("#");
+  return result;
+}
+
+/**
+ * Extracts the strings after the given position.
+ * Negative indices are used to indicate that there's a deleted element near
+ * position `i`.
+ *
+ * Adds "#" at the end of the result to mark the end of the sequence.
+ */
+function extractAfter(s: string[], i: number): string[] {
+  // TODO should the index be -i-1 or -i when i is negative?
+  const result = i >= 0 ? s.slice(i + 1) : s.slice(-i - 1);
+  result.push("#");
+  return result;
 }
