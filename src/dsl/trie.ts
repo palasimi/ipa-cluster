@@ -72,7 +72,6 @@ export class Trie {
    * Returns true as soon as an accept state is reached.
    */
   test(input: string[], language = "_"): boolean {
-    // TODO handle "#"
     let node = this.root;
 
     // Early return if already at an accept state.
