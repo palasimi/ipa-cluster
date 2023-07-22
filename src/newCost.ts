@@ -7,6 +7,7 @@ import { compile } from "./dsl/index";
 
 /**
  * Creates cost function for IPA clustering.
+ * May raise `ParseError`.
  */
 export function createCostFunction(code: string): CostFunction<string[]> {
   const querier = compile(code);
