@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --declaration --declarationMap --sourceMap --strict --module commonjs --outDir build --target es6 src/index.ts scripts/demo.ts",
+    "build": "tsc --declaration --declarationMap --sourceMap --strict --module commonjs --outDir build --target es6 src/index.ts scripts/demo.ts scripts/dataset.ts",
     "check": "npm run format && npm run typecheck && npm run lint && npm run test:cov",
     "dist": "npm run build && rm -rf dist && cp -r build/src dist",
     "format": "prettier --check .",

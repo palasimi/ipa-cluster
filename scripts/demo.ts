@@ -19,6 +19,7 @@ const dataset = JSON.parse(readFileSync(inputFile, { encoding })).translations;
 
 const options = {
   ignores: ignoreFile == null ? "" : readFileSync(ignoreFile, { encoding }),
+  epsilon: 0,
 };
 
 const clusters = clusterByIPA(dataset, options);
