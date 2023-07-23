@@ -79,7 +79,8 @@ export function levenshtein<T extends Sequence>(
   for (let i = 0; i < s.length; i++) {
     for (let j = 0; j < t.length; j++) {
       if (s[i] === t[j]) {
-        // We add one, because `distance` is 1-indexed.
+        // We add one, because `distance` is 1-indexed, while the strings are
+        // 0-indexed.
         distance[i + 1][j + 1] = distance[i][j];
         continue;
       }

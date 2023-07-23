@@ -96,8 +96,7 @@ export class ContextMatcher {
  * Also adds "#" at the end of the result (word boundary).
  */
 function extractBefore(s: string[], i: number): string[] {
-  // TODO should the index be -i-1 or -i when i is negative?
-  const result = i >= 0 ? s.slice(0, i) : s.slice(0, -i - 1);
+  const result = i >= 0 ? s.slice(0, i) : s.slice(0, -i);
   result.reverse();
   result.push("#");
   return result;
@@ -111,8 +110,7 @@ function extractBefore(s: string[], i: number): string[] {
  * Adds "#" at the end of the result to mark the end of the sequence.
  */
 function extractAfter(s: string[], i: number): string[] {
-  // TODO should the index be -i-1 or -i when i is negative?
-  const result = i >= 0 ? s.slice(i + 1) : s.slice(-i - 1);
+  const result = i >= 0 ? s.slice(i + 1) : s.slice(-i);
   result.push("#");
   return result;
 }
