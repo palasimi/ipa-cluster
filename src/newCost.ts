@@ -20,6 +20,8 @@ export function createCostFunction(code: string): CostFunction<string[]> {
   ) {
     const l1 = (options.left as string) || "_";
     const l2 = (options.right as string) || "_";
-    return Number(querier.query(s, t, i, j, l1, l2));
+
+    const found = querier.query(s, t, i, j, l1, l2);
+    return found ? 0 : 1;
   };
 }
