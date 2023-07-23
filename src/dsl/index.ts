@@ -2,3 +2,4 @@
 // Copyright (c) 2023 Levi Gruspe
 
 export { compile, Querier } from "./compiler";
+export { ParseError } from "./parser";

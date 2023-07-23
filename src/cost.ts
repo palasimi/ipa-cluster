@@ -3,16 +3,14 @@
 
 import { CostFunction, CostFunctionOptions } from "./ipa-cluster/metrics";
 
-import { parse, toQuerier } from "./sound-change-parser/index";
+import { compile } from "./dsl/index";
 
-// Create cost function for IPA clustering.
-// The sound changes in `code` are exempted from penalties when computing edit
-// distances.
-// May raise `ParseError`.
+/**
+ * Creates cost function for IPA clustering.
+ * May raise `ParseError`.
+ */
 export function createCostFunction(code: string): CostFunction<string[]> {
-  const tree = parse(code);
-  const hasRule = toQuerier(tree);
-
+  const querier = compile(code);
   return function customCost(
     s: string[],
     t: string[],
@@ -20,28 +18,10 @@ export function createCostFunction(code: string): CostFunction<string[]> {
     j: number,
     options: CostFunctionOptions = {}
   ) {
-    const a = s[i] || "";
-    const b = t[j] || "";
+    const l1 = (options.left as string) || "_";
+    const l2 = (options.right as string) || "_";
 
-    if (a === b) {
-      return 0;
-    }
-
-    const left = (options.left as string) || "*";
-    const right = (options.right as string) || "*";
-    const context = { left, right };
-
-    const environmentS = {
-      before: s[i - 1] || "#",
-      after: s[i + 1] || "#",
-    };
-    const environmentT = {
-      before: t[j - 1] || "#",
-      after: t[j + 1] || "#",
-    };
-
-    const optionsS = { context, environment: environmentS };
-    const optionsT = { context, environment: environmentT };
-    return hasRule(a, b, optionsS) ? 0 : hasRule(a, b, optionsT) ? 0 : 1;
+    const found = querier.query(s, t, i, j, l1, l2);
+    return found ? 0 : 1;
   };
 }

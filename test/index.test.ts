@@ -21,9 +21,9 @@ describe("clusterByIPA", () => {
     it("should not penalize edits specified in the ruleset", () => {
       const ignores = `
         -- Sound changes work like types of edits to ignore.
-        q -> a
-        w -> s
-        e -> d
+        q ~ a
+        w ~ s
+        e ~ d
       `;
       const clusters = clusterByIPA(dataset, { ignores, epsilon: 2 });
       clusters.sort((a: Data[], b: Data[]) => a.length - b.length);
